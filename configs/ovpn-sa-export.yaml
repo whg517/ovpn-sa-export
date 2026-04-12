@@ -1,0 +1,43 @@
+# ovpn-sa-export.yaml
+
+# Data source configuration
+backend:
+  # Collection mode: "sacli" (local) or "xmlrpc" (remote)
+  mode: sacli
+
+  # sacli mode configuration
+  sacli:
+    path: /usr/local/openvpn_as/scripts/sacli
+    timeout: 10s
+
+  # xmlrpc mode configuration
+  xmlrpc:
+    endpoint: https://vpn.example.com/RPC2/
+    username: admin
+    password: ${XMLRPC_PASSWORD}
+    socket_path: ""
+    timeout: 10
+    insecure_skip_verify: false
+
+# HTTP server configuration
+server:
+  listen_address: ":9176"
+  metrics_path: "/metrics"
+  health_path: "/health"
+  ready_path: "/ready"
+
+# Collector configuration
+collector:
+  scrape_interval: 15s
+  timeout: 30s
+  cache_ttl: 60s
+  enabled_collectors:
+    - vpn_status
+    - vpn_summary
+    - subscription
+    - service
+
+# Log configuration
+log:
+  level: info
+  format: json

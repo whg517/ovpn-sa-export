@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/whg517/ovpn-sa-export/internal/config"
@@ -28,7 +29,7 @@ func New(cfg config.ServerConfig, registry *metrics.Registry) *Server {
 	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc(cfg.MetricsPath, s.handleMetrics)
+	mux.Handle(cfg.MetricsPath, promhttp.HandlerFor(registry.PromRegistry(), promhttp.HandlerOpts{}))
 	mux.HandleFunc(cfg.HealthPath, s.handleHealth)
 	mux.HandleFunc(cfg.ReadyPath, s.handleReady)
 
@@ -47,20 +48,16 @@ func New(cfg config.ServerConfig, registry *metrics.Registry) *Server {
 
 // ListenAndServe starts the HTTP server.
 func (s *Server) ListenAndServe() error {
-	slog.Info("starting HTTP server", "addr", s.cfg.ListenAddress, "metrics", s.cfg.MetricsPath)
+	slog.Info("starting HTTP server", "addr", s.server.Addr, "metrics", s.cfg.MetricsPath)
 	return s.server.ListenAndServe()
 }
 
 // Shutdown gracefully stops the server.
 func (s *Server) Shutdown() {
 	s.ready = false
-	ctx, cancel := context.WithTimeout(context.Background(), 5)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	s.server.Shutdown(ctx)
-}
-
-func (s *Server) handleMetrics(w http.ResponseWriter, r *http.Request) {
-	promhttp.Handler().ServeHTTP(w, r)
 }
 
 func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {

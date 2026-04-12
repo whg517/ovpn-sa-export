@@ -20,16 +20,16 @@ type DaemonStatus struct {
 
 // ClientHeader maps header names to field indices.
 type ClientHeader struct {
-	CommonName     int `xml:"Common Name"`
-	RealAddress    int `xml:"Real Address"`
-	VirtualAddress int `xml:"Virtual Address"`
-	VirtualIPv6    int `xml:"Virtual IPv6 Address"`
-	BytesReceived  int `xml:"Bytes Received"`
-	BytesSent      int `xml:"Bytes Sent"`
-	ConnectedSince int `xml:"Connected Since (time_t)"`
+	CommonName     int `xml:"Common_Name"`
+	RealAddress    int `xml:"Real_Address"`
+	VirtualAddress int `xml:"Virtual_Address"`
+	VirtualIPv6    int `xml:"Virtual_IPv6_Address"`
+	BytesReceived  int `xml:"Bytes_Received"`
+	BytesSent      int `xml:"Bytes_Sent"`
+	ConnectedSince int `xml:"Connected_Since_time_t"`
 	Username       int `xml:"Username"`
-	ClientID       int `xml:"Client ID"`
-	PeerID         int `xml:"Peer ID"`
+	ClientID       int `xml:"Client_ID"`
+	PeerID         int `xml:"Peer_ID"`
 }
 
 // ClientList represents a single client entry.

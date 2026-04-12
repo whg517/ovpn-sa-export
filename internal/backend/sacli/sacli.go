@@ -113,7 +113,7 @@ func parseVPNStatus(output string) ([]types.VPNClientStatus, error) {
 		}
 
 		if strings.HasPrefix(line, "CLIENT_LIST") {
-			fields := strings.Fields(line)
+			fields := strings.Split(line, "	")
 			if len(fields) < 11 {
 				continue
 			}

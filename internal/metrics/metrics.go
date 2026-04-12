@@ -7,8 +7,9 @@ import (
 	"github.com/whg517/ovpn-sa-export/pkg/types"
 )
 
-// Registry holds all Prometheus metrics.
+// Registry holds all Prometheus metrics and a custom prometheus registry.
 type Registry struct {
+	promRegistry      *prometheus.Registry
 	up                prometheus.Gauge
 	connectedClients  prometheus.Gauge
 	dcoAvailable      prometheus.Gauge
@@ -26,9 +27,11 @@ type Registry struct {
 	scrapeErrors      *prometheus.CounterVec
 }
 
-// NewRegistry creates and registers all metrics.
+// NewRegistry creates and registers all metrics in a custom registry.
 func NewRegistry() *Registry {
-	r := &Registry{}
+	r := &Registry{
+		promRegistry: prometheus.NewRegistry(),
+	}
 
 	r.up = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name: "ovpn_sa_export_up",
@@ -96,12 +99,7 @@ func NewRegistry() *Registry {
 		Help: "Total number of scrape errors.",
 	}, []string{"collector"})
 
-	r.register()
-	return r
-}
-
-func (r *Registry) register() {
-	prometheus.MustRegister(
+	r.promRegistry.MustRegister(
 		r.up,
 		r.connectedClients,
 		r.dcoAvailable,
@@ -118,6 +116,12 @@ func (r *Registry) register() {
 		r.scrapeTotal,
 		r.scrapeErrors,
 	)
+	return r
+}
+
+// PromRegistry returns the underlying prometheus.Registry for use with promhttp.Handler.
+func (r *Registry) PromRegistry() *prometheus.Registry {
+	return r.promRegistry
 }
 
 // RecordScrape records a scrape attempt result.

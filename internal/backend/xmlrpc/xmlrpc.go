@@ -3,6 +3,7 @@ package xmlrpc
 import (
 	"context"
 	"crypto/tls"
+	"encoding/base64"
 	"fmt"
 	"net"
 	"net/http"
@@ -156,7 +157,6 @@ func (b *Backend) CollectServiceStatus(ctx context.Context) (*types.ServiceStatu
 var _ backend.CollectorBackend = (*Backend)(nil)
 
 func basicAuth(username, password string) string {
-	// Simplified basic auth - in production use encoding/base64
-	// This avoids importing encoding for a small helper
-	return "Basic " + username + ":" + password
+	creds := base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
+	return "Basic " + creds
 }

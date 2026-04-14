@@ -57,7 +57,7 @@ func (s *Server) Shutdown() {
 	s.ready = false
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	s.server.Shutdown(ctx)
+	_ = s.server.Shutdown(ctx)
 }
 
 func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {

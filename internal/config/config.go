@@ -8,36 +8,19 @@ import (
 )
 
 type Config struct {
-	Backend   BackendConfig   `mapstructure:"backend"`
-	Instances []InstanceConfig `mapstructure:"instances"`
-	Server    ServerConfig    `mapstructure:"server"`
+	Backend   BackendConfig  `mapstructure:"backend"`
+	Server    ServerConfig   `mapstructure:"server"`
 	Collector CollectorConfig `mapstructure:"collector"`
-	Log       LogConfig       `mapstructure:"log"`
+	Log       LogConfig      `mapstructure:"log"`
 }
 
 type BackendConfig struct {
-	Mode   string        `mapstructure:"mode"`
-	Sacli  SacliConfig   `mapstructure:"sacli"`
-	XMLRPC XMLRPCConfig  `mapstructure:"xmlrpc"`
+	Sacli SacliConfig `mapstructure:"sacli"`
 }
 
 type SacliConfig struct {
 	Path    string        `mapstructure:"path"`
 	Timeout time.Duration `mapstructure:"timeout"`
-}
-
-type XMLRPCConfig struct {
-	Endpoint              string        `mapstructure:"endpoint"`
-	Username              string        `mapstructure:"username"`
-	Password              string        `mapstructure:"password"`
-	SocketPath            string        `mapstructure:"socket_path"`
-	Timeout               time.Duration `mapstructure:"timeout"`
-	InsecureSkipVerify    bool          `mapstructure:"insecure_skip_verify"`
-}
-
-type InstanceConfig struct {
-	Name    string        `mapstructure:"name"`
-	Backend BackendConfig `mapstructure:"backend"`
 }
 
 type ServerConfig struct {
@@ -48,10 +31,10 @@ type ServerConfig struct {
 }
 
 type CollectorConfig struct {
-	ScrapeInterval   time.Duration `mapstructure:"scrape_interval"`
-	Timeout          time.Duration `mapstructure:"timeout"`
-	CacheTTL         time.Duration `mapstructure:"cache_ttl"`
-	EnabledCollectors []string     `mapstructure:"enabled_collectors"`
+	ScrapeInterval    time.Duration `mapstructure:"scrape_interval"`
+	Timeout           time.Duration `mapstructure:"timeout"`
+	CacheTTL          time.Duration `mapstructure:"cache_ttl"`
+	EnabledCollectors []string      `mapstructure:"enabled_collectors"`
 }
 
 type LogConfig struct {
@@ -63,11 +46,8 @@ func Load() (*Config, error) {
 	v := viper.New()
 
 	// Defaults
-	v.SetDefault("backend.mode", "sacli")
 	v.SetDefault("backend.sacli.path", "/usr/local/openvpn_as/scripts/sacli")
 	v.SetDefault("backend.sacli.timeout", "10s")
-	v.SetDefault("backend.xmlrpc.timeout", "10s")
-	v.SetDefault("backend.xmlrpc.insecure_skip_verify", false)
 	v.SetDefault("server.listen_address", ":9176")
 	v.SetDefault("server.metrics_path", "/metrics")
 	v.SetDefault("server.health_path", "/health")

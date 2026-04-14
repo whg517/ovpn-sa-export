@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/whg517/ovpn-sa-export/internal/backend"
 	"github.com/whg517/ovpn-sa-export/pkg/types"
 )
 
@@ -90,8 +89,7 @@ func (b *Backend) run(ctx context.Context, args ...string) (string, error) {
 	return string(out), nil
 }
 
-// Ensure Backend implements backend.CollectorBackend.
-var _ backend.CollectorBackend = (*Backend)(nil)
+
 
 // --- Parsers ---
 

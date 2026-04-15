@@ -17,14 +17,23 @@ type Config struct {
 	Timeout time.Duration
 }
 
+// RunFunc is a function that executes a command and returns its output.
+type RunFunc func(ctx context.Context, path string, args ...string) (string, error)
+
 // Backend implements backend.CollectorBackend using local sacli commands.
 type Backend struct {
 	path    string
 	timeout time.Duration
+	runFn   RunFunc
 }
 
 // New creates a new sacli backend.
 func New(cfg Config) *Backend {
+	return NewWithRunner(cfg, nil)
+}
+
+// NewWithRunner creates a new sacli backend with a custom run function (for testing).
+func NewWithRunner(cfg Config, runFn RunFunc) *Backend {
 	path := cfg.Path
 	if path == "" {
 		path = "/usr/local/openvpn_as/scripts/sacli"
@@ -33,7 +42,21 @@ func New(cfg Config) *Backend {
 	if timeout == 0 {
 		timeout = 10 * time.Second
 	}
-	return &Backend{path: path, timeout: timeout}
+	if runFn == nil {
+		runFn = defaultRun
+	}
+	return &Backend{path: path, timeout: timeout, runFn: runFn}
+}
+
+func defaultRun(ctx context.Context, path string, args ...string) (string, error) {
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, path, args...)
+	out, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
+	return string(out), nil
 }
 
 // Name returns the backend name.
@@ -76,17 +99,7 @@ func (b *Backend) CollectServiceStatus(ctx context.Context) (*types.ServiceStatu
 }
 
 func (b *Backend) run(ctx context.Context, args ...string) (string, error) {
-	ctx, cancel := context.WithTimeout(ctx, b.timeout)
-	defer cancel()
-
-	allArgs := append([]string{}, args...)
-	cmd := exec.CommandContext(ctx, b.path, allArgs...)
-
-	out, err := cmd.Output()
-	if err != nil {
-		return "", err
-	}
-	return string(out), nil
+	return b.runFn(ctx, b.path, args...)
 }
 
 

@@ -57,6 +57,25 @@ func TestReadyEndpointNotReady(t *testing.T) {
 	assert.Equal(t, http.StatusServiceUnavailable, w.Code)
 }
 
+func TestNewDefaultAddress(t *testing.T) {
+	registry := metrics.NewRegistry()
+	cfg := config.ServerConfig{
+		MetricsPath: "/metrics",
+		HealthPath:  "/health",
+		ReadyPath:   "/ready",
+	}
+	srv := New(cfg, registry)
+	assert.NotNil(t, srv)
+	assert.Equal(t, ":9176", srv.server.Addr)
+}
+
+func TestShutdown(t *testing.T) {
+	srv, _ := newTestServer(t)
+	// Shutdown should not panic
+	srv.Shutdown()
+	assert.False(t, srv.ready)
+}
+
 func TestMetricsEndpoint(t *testing.T) {
 	_, reg := newTestServer(t)
 

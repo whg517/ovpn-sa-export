@@ -12,7 +12,7 @@ import (
 func TestLoadDefaults(t *testing.T) {
 	os.Unsetenv("OVPN_SA_SERVER_LISTEN_ADDRESS")
 
-	cfg, err := Load()
+	cfg, err := Load("")
 	require.NoError(t, err)
 	assert.Equal(t, ":9176", cfg.Server.ListenAddress)
 	assert.Equal(t, "/metrics", cfg.Server.MetricsPath)
@@ -27,7 +27,7 @@ func TestLoadFromEnv(t *testing.T) {
 	os.Setenv("OVPN_SA_SERVER_LISTEN_ADDRESS", ":8080")
 	defer os.Unsetenv("OVPN_SA_SERVER_LISTEN_ADDRESS")
 
-	cfg, err := Load()
+	cfg, err := Load("")
 	require.NoError(t, err)
 	assert.Equal(t, ":8080", cfg.Server.ListenAddress)
 }

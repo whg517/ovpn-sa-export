@@ -42,7 +42,7 @@ type LogConfig struct {
 	Format string `mapstructure:"format"`
 }
 
-func Load() (*Config, error) {
+func Load(configFile string) (*Config, error) {
 	v := viper.New()
 
 	// Defaults
@@ -62,11 +62,15 @@ func Load() (*Config, error) {
 	v.SetDefault("log.format", "json")
 
 	// Config file
-	v.SetConfigName("ovpn-sa-export")
-	v.SetConfigType("yaml")
-	v.AddConfigPath("/etc/ovpn-sa-export")
-	v.AddConfigPath(".")
-	v.AddConfigPath("$HOME/.ovpn-sa-export")
+	if configFile != "" {
+		v.SetConfigFile(configFile)
+	} else {
+		v.SetConfigName("ovpn-sa-export")
+		v.SetConfigType("yaml")
+		v.AddConfigPath("/etc/ovpn-sa-export")
+		v.AddConfigPath(".")
+		v.AddConfigPath("$HOME/.ovpn-sa-export")
+	}
 
 	// Environment variables
 	v.SetEnvPrefix("OVPN_SA")

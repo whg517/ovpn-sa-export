@@ -1,7 +1,10 @@
 BINARY_NAME=ovpn-sa-export
 VERSION?=dev
+COMMIT?=$(shell git rev-parse --short HEAD 2>/dev/null || echo none)
+BUILD_TIME?=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
+GOVERSION?=$(shell go version | awk '{print $$3}')
 GO?=go
-GOFLAGS?=-ldflags="-s -w -X main.version=$(VERSION)"
+GOFLAGS?=-ldflags="-s -w -X main.version=$(VERSION) -X main.commit=$(COMMIT) -X main.buildTime=$(BUILD_TIME) -X main.goVersion=$(GOVERSION)"
 
 .PHONY: all build test lint fmt vet clean docker-build help
 

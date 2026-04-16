@@ -14,8 +14,13 @@ import (
 	"github.com/whg517/ovpn-sa-export/internal/server"
 )
 
-// Version is set at build time via -ldflags.
-var version = "dev"
+// Build info, set at build time via -ldflags.
+var (
+	version      = "dev"
+	commit       = "none"
+	buildTime    = "unknown"
+	goVersion    = "unknown"
+)
 
 func main() {
 	showVersion := flag.Bool("version", false, "Print version and exit")
@@ -24,6 +29,9 @@ func main() {
 
 	if *showVersion {
 		fmt.Printf("ovpn-sa-export %s\n", version)
+		fmt.Printf("  commit:    %s\n", commit)
+		fmt.Printf("  build time: %s\n", buildTime)
+		fmt.Printf("  go:        %s\n", goVersion)
 		os.Exit(0)
 	}
 
@@ -35,11 +43,10 @@ func main() {
 
 func run(configFile string) error {
 	// Load configuration
-	cfg, err := config.Load()
+	cfg, err := config.Load(configFile)
 	if err != nil {
 		return fmt.Errorf("load config: %w", err)
 	}
-	_ = configFile // TODO: support explicit config file path
 
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
@@ -64,7 +71,7 @@ func run(configFile string) error {
 		srv.Shutdown()
 	}()
 
-	fmt.Printf("ovpn-sa-export %s starting\n", version)
+	fmt.Printf("ovpn-sa-export %s (commit: %s, built: %s)\n", version, commit, buildTime)
 	fmt.Printf("backend: sacli\n")
 	fmt.Printf("listening on: %s\n", cfg.Server.ListenAddress)
 	fmt.Printf("metrics path: %s\n", cfg.Server.MetricsPath)

@@ -284,7 +284,7 @@ func jsonFloat(row []interface{}, idx float64) float64 {
 			return v
 		case string:
 			var f float64
-			fmt.Sscanf(v, "%f", &f)
+			_, _ = fmt.Sscanf(v, "%f", &f)
 			return f
 		}
 	}
@@ -297,7 +297,7 @@ func jsonToFloat64(v interface{}) float64 {
 		return val
 	case string:
 		var f float64
-		fmt.Sscanf(val, "%f", &f)
+		_, _ = fmt.Sscanf(val, "%f", &f)
 		return f
 	case int:
 		return float64(val)

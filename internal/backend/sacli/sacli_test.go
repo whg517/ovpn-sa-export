@@ -158,6 +158,26 @@ func TestParseSubscriptionStatus_InvalidJSON(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func TestParseSubscriptionStatus_NotConfigured(t *testing.T) {
+	s, err := parseSubscriptionStatus(fixture(t, "subscription_status_not_configured.txt"))
+	require.NoError(t, err)
+	assert.Equal(t, "NOT_CONFIGURED", s.State)
+	assert.Equal(t, 0, s.CurrentConnections)
+}
+
+func TestToJSON_PythonDict(t *testing.T) {
+	input := "{'key': 'value', 'flag': True, 'none': None}"
+	result := toJSON(input)
+	assert.Equal(t, `{"key": "value", "flag": true, "none": null}`, result)
+}
+
+func TestToJSON_StandardJSON(t *testing.T) {
+	input := `{"key": "value"}`
+	result := toJSON(input)
+	// Already double-quoted, single quote replacement is no-op
+	assert.Equal(t, `{"key": "value"}`, result)
+}
+
 // --- ServiceStatus Parser Tests ---
 
 func TestParseServiceStatus(t *testing.T) {

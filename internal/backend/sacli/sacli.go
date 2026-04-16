@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/whg517/ovpn-sa-export/pkg/types"
@@ -101,7 +102,14 @@ func (b *Backend) run(ctx context.Context, args ...string) (string, error) {
 	return b.runFn(ctx, b.path, args...)
 }
 
-// --- JSON response types ---
+// toJSON converts sacli's Python dict output (single quotes, True/False/None) to valid JSON.
+func toJSON(input string) string {
+	s := strings.ReplaceAll(input, "'", "\"")
+	s = strings.ReplaceAll(s, "True", "true")
+	s = strings.ReplaceAll(s, "False", "false")
+	s = strings.ReplaceAll(s, "None", "null")
+	return s
+}
 
 // vpnStatusResponse is the JSON output of "sacli VPNStatus".
 type vpnStatusResponse map[string]vpnDaemonStatus
@@ -120,7 +128,7 @@ type vpnDaemonStatus struct {
 
 func parseVPNStatus(output string) ([]types.VPNClientStatus, error) {
 	var resp vpnStatusResponse
-	if err := json.Unmarshal([]byte(output), &resp); err != nil {
+	if err := json.Unmarshal([]byte(toJSON(output)), &resp); err != nil {
 		return nil, fmt.Errorf("parse VPNStatus JSON: %w", err)
 	}
 
@@ -169,7 +177,7 @@ func parseVPNStatus(output string) ([]types.VPNClientStatus, error) {
 
 func parseVPNSummary(output string) (*types.VPNSummary, error) {
 	var raw map[string]interface{}
-	if err := json.Unmarshal([]byte(output), &raw); err != nil {
+	if err := json.Unmarshal([]byte(toJSON(output)), &raw); err != nil {
 		return nil, fmt.Errorf("parse VPNSummary JSON: %w", err)
 	}
 
@@ -188,7 +196,7 @@ func parseVPNSummary(output string) (*types.VPNSummary, error) {
 
 func parseSubscriptionStatus(output string) (*types.SubscriptionStatus, error) {
 	var raw map[string]interface{}
-	if err := json.Unmarshal([]byte(output), &raw); err != nil {
+	if err := json.Unmarshal([]byte(toJSON(output)), &raw); err != nil {
 		return nil, fmt.Errorf("parse SubscriptionStatus JSON: %w", err)
 	}
 
@@ -215,7 +223,7 @@ func parseSubscriptionStatus(output string) (*types.SubscriptionStatus, error) {
 
 func parseServiceStatus(output string) (*types.ServiceStatus, error) {
 	var raw map[string]interface{}
-	if err := json.Unmarshal([]byte(output), &raw); err != nil {
+	if err := json.Unmarshal([]byte(toJSON(output)), &raw); err != nil {
 		return nil, fmt.Errorf("parse status JSON: %w", err)
 	}
 

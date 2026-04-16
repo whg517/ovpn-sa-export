@@ -69,7 +69,8 @@ changelog:
       order: 999
 
 dockers:
-  - image_templates:
+  - use: docker
+    image_templates:
       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:{{ .Version }}"
       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:latest"
     dockerfile: deployments/Dockerfile
@@ -77,25 +78,16 @@ dockers:
       - "--label=org.opencontainers.image.version={{.Version}}"
       - "--label=org.opencontainers.image.revision={{.Commit}}"
       - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--platform=linux/amd64"
-  - image_templates:
-      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:{{ .Version }}-arm64"
-      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:latest-arm64"
-    dockerfile: deployments/Dockerfile
-    goarch: arm64
-    build_flag_templates:
-      - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.revision={{.Commit}}"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--platform=linux/arm64"
 
-docker_manifests:
-  - name_template: "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:{{ .Version }}"
-    image_templates:
-      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:{{ .Version }}-amd64"
-      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:{{ .Version }}-arm64"
-  - name_template: "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:latest"
-    image_templates:
-      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:latest-amd64"
-      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:latest-arm64"
+# docker_manifests:
+#   Uncomment when Docker multi-arch builds are ready.
+#   Requires QEMU setup in CI for cross-compilation.
+#   - name_template: "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:{{ .Version }}"
+#     image_templates:
+#       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:{{ .Version }}-amd64"
+#       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:{{ .Version }}-arm64"
+#   - name_template: "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:latest"
+#     image_templates:
+#       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:latest-amd64"
+#       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:latest-arm64"
 

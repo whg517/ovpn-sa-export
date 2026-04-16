@@ -1,4 +1,4 @@
-module github.com/whg517/ovpn-sa-export
+module github.com/whg517/openvpn-as-exporter
 
 go 1.24.4
 

@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/whg517/ovpn-sa-export/internal/config"
-	"github.com/whg517/ovpn-sa-export/internal/metrics"
+	"github.com/whg517/openvpn-as-exporter/internal/config"
+	"github.com/whg517/openvpn-as-exporter/internal/metrics"
 )
 
 // Server serves Prometheus metrics and health endpoints.

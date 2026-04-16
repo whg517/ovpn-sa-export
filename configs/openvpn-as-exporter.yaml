@@ -1,4 +1,4 @@
-# ovpn-sa-export.yaml
+# openvpn-as-exporter.yaml
 
 # Data source configuration
 backend:

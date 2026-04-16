@@ -10,7 +10,7 @@ import (
 )
 
 func TestLoadDefaults(t *testing.T) {
-	os.Unsetenv("OVPN_SA_SERVER_LISTEN_ADDRESS")
+	os.Unsetenv("OPENVPN_AS_EXPORTER_SERVER_LISTEN_ADDRESS")
 
 	cfg, err := Load("")
 	require.NoError(t, err)
@@ -24,8 +24,8 @@ func TestLoadDefaults(t *testing.T) {
 }
 
 func TestLoadFromEnv(t *testing.T) {
-	os.Setenv("OVPN_SA_SERVER_LISTEN_ADDRESS", ":8080")
-	defer os.Unsetenv("OVPN_SA_SERVER_LISTEN_ADDRESS")
+	os.Setenv("OPENVPN_AS_EXPORTER_SERVER_LISTEN_ADDRESS", ":8080")
+	defer os.Unsetenv("OPENVPN_AS_EXPORTER_SERVER_LISTEN_ADDRESS")
 
 	cfg, err := Load("")
 	require.NoError(t, err)

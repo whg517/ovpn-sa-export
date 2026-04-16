@@ -2,8 +2,8 @@ FROM alpine:3.22
 
 RUN apk --no-cache add ca-certificates tzdata
 
-COPY ovpn-sa-export /usr/local/bin/ovpn-sa-export
+COPY openvpn-as-exporter /usr/local/bin/openvpn-as-exporter
 
 EXPOSE 9176
 
-ENTRYPOINT ["ovpn-sa-export"]
+ENTRYPOINT ["openvpn-as-exporter"]

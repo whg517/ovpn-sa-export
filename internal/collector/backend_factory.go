@@ -1,8 +1,8 @@
 package collector
 
 import (
-	"github.com/whg517/ovpn-sa-export/internal/backend/sacli"
-	"github.com/whg517/ovpn-sa-export/internal/config"
+	"github.com/whg517/openvpn-as-exporter/internal/backend/sacli"
+	"github.com/whg517/openvpn-as-exporter/internal/config"
 )
 
 func createBackend(cfg *config.Config) (Backend, error) {

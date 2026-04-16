@@ -8,9 +8,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/whg517/ovpn-sa-export/internal/config"
-	"github.com/whg517/ovpn-sa-export/internal/metrics"
-	"github.com/whg517/ovpn-sa-export/pkg/types"
+	"github.com/whg517/openvpn-as-exporter/internal/config"
+	"github.com/whg517/openvpn-as-exporter/internal/metrics"
+	"github.com/whg517/openvpn-as-exporter/pkg/types"
 )
 
 // mockBackend implements Backend for testing.

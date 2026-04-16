@@ -1,4 +1,4 @@
-BINARY_NAME=ovpn-sa-export
+BINARY_NAME=openvpn-as-exporter
 VERSION?=dev
 COMMIT?=$(shell git rev-parse --short HEAD 2>/dev/null || echo none)
 BUILD_TIME?=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
@@ -12,7 +12,7 @@ all: lint test build
 
 ## build: Build the binary
 build:
-	$(GO) build $(GOFLAGS) -o $(BINARY_NAME) ./cmd/ovpn-sa-export
+	$(GO) build $(GOFLAGS) -o $(BINARY_NAME) ./cmd/openvpn-as-exporter
 
 ## test: Run all tests
 test:

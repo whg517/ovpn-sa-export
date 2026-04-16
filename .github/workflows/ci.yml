@@ -55,16 +55,16 @@ jobs:
       - name: Build binary
         run: |
           go build -ldflags="-s -w -X main.version=$(git describe --tags --always --dirty) -X main.commit=$(git rev-parse --short HEAD) -X main.buildTime=$(date -u '+%Y-%m-%dT%H:%M:%SZ') -X main.goVersion=$GOVERSION" \
-            -o ovpn-sa-export ./cmd/ovpn-sa-export
+            -o openvpn-as-exporter ./cmd/openvpn-as-exporter
 
       - name: Build Docker image (multi-stage)
-        run: docker build -f deployments/Dockerfile.legacy -t ovpn-sa-export .
+        run: docker build -f deployments/Dockerfile.legacy -t openvpn-as-exporter .
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ovpn-sa-export-linux-amd64
-          path: ovpn-sa-export
+          name: openvpn-as-exporter-linux-amd64
+          path: openvpn-as-exporter
 
   docker:
     name: Docker Build

@@ -1,16 +1,16 @@
 version: "3.8"
 
 services:
-  ovpn-sa-export:
+  openvpn-as-exporter:
     build:
       context: ..
       dockerfile: deployments/Dockerfile
-    container_name: ovpn-sa-export
+    container_name: openvpn-as-exporter
     volumes:
-      - ../configs/ovpn-sa-export.yaml:/etc/ovpn-sa-export/config.yaml:ro
+      - ../configs/openvpn-as-exporter.yaml:/etc/openvpn-as-exporter/config.yaml:ro
       # Mount sacli scripts for local mode
       - /usr/local/openvpn_as/scripts:/usr/local/openvpn_as/scripts:ro
     network_mode: host
     restart: unless-stopped
     environment:
-      - OVPN_SA_BACKEND_MODE=sacli
+      - OPENVPN_AS_EXPORTER_BACKEND_MODE=sacli

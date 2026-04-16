@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/whg517/ovpn-sa-export/pkg/types"
+	"github.com/whg517/openvpn-as-exporter/pkg/types"
 )
 
 // Registry holds all Prometheus metrics and a custom prometheus registry.
@@ -30,51 +30,51 @@ func NewRegistry() *Registry {
 	}
 
 	r.up = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "ovpn_sa_export_up",
+		Name: "openvpn_as_exporter_up",
 		Help: "Whether the last scrape of OpenVPN AS was successful.",
 	})
 	r.connectedClients = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "ovpn_sa_export_connected_clients",
+		Name: "openvpn_as_exporter_connected_clients",
 		Help: "Number of currently connected VPN clients.",
 	})
 	r.dcoAvailable = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "ovpn_sa_export_dco_available",
+		Name: "openvpn_as_exporter_dco_available",
 		Help: "Whether OpenVPN DCO (Data Channel Offload) is available.",
 	})
 	r.dcoVersion = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "ovpn_sa_export_dco_version",
+		Name: "openvpn_as_exporter_dco_version",
 		Help: "OpenVPN DCO version info (1 if available).",
 	}, []string{"version"})
 
 	r.clientBytesRecv = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "ovpn_sa_export_client_bytes_received",
+		Name: "openvpn_as_exporter_client_bytes_received",
 		Help: "Total bytes received from a VPN client.",
 	}, []string{"username", "common_name", "real_addr", "virtual_addr"})
 	r.clientBytesSent = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "ovpn_sa_export_client_bytes_sent",
+		Name: "openvpn_as_exporter_client_bytes_sent",
 		Help: "Total bytes sent to a VPN client.",
 	}, []string{"username", "common_name", "real_addr", "virtual_addr"})
 	r.clientConnected = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "ovpn_sa_export_client_connected_since",
+		Name: "openvpn_as_exporter_client_connected_since",
 		Help: "UNIX timestamp when the VPN client connected.",
 	}, []string{"username", "common_name"})
 
 	r.serviceUp = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "ovpn_sa_export_service_up",
+		Name: "openvpn_as_exporter_service_up",
 		Help: "Whether an internal AS service is running.",
 	}, []string{"service"})
 
 	r.scrapeDuration = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Name:    "ovpn_sa_export_scrape_duration_seconds",
+		Name:    "openvpn_as_exporter_scrape_duration_seconds",
 		Help:    "Duration of the last scrape for each collector.",
 		Buckets: []float64{0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5},
 	}, []string{"collector"})
 	r.scrapeTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: "ovpn_sa_export_scrapes_total",
+		Name: "openvpn_as_exporter_scrapes_total",
 		Help: "Total number of scrapes.",
 	}, []string{"collector"})
 	r.scrapeErrors = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: "ovpn_sa_export_scrape_errors_total",
+		Name: "openvpn_as_exporter_scrape_errors_total",
 		Help: "Total number of scrape errors.",
 	}, []string{"collector"})
 

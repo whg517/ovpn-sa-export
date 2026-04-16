@@ -5,8 +5,8 @@ before:
     - go mod tidy
 
 builds:
-  - main: ./cmd/ovpn-sa-export
-    binary: ovpn-sa-export
+  - main: ./cmd/openvpn-as-exporter
+    binary: openvpn-as-exporter
     env:
       - CGO_ENABLED=0
     ldflags:
@@ -71,8 +71,8 @@ changelog:
 dockers:
   - use: docker
     image_templates:
-      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:{{ .Version }}"
-      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:latest"
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/openvpn-as-exporter:{{ .Version }}"
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/openvpn-as-exporter:latest"
     dockerfile: deployments/Dockerfile
     build_flag_templates:
       - "--label=org.opencontainers.image.version={{.Version}}"
@@ -82,12 +82,12 @@ dockers:
 # docker_manifests:
 #   Uncomment when Docker multi-arch builds are ready.
 #   Requires QEMU setup in CI for cross-compilation.
-#   - name_template: "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:{{ .Version }}"
+#   - name_template: "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/openvpn-as-exporter:{{ .Version }}"
 #     image_templates:
-#       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:{{ .Version }}-amd64"
-#       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:{{ .Version }}-arm64"
-#   - name_template: "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:latest"
+#       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/openvpn-as-exporter:{{ .Version }}-amd64"
+#       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/openvpn-as-exporter:{{ .Version }}-arm64"
+#   - name_template: "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/openvpn-as-exporter:latest"
 #     image_templates:
-#       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:latest-amd64"
-#       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:latest-arm64"
+#       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/openvpn-as-exporter:latest-amd64"
+#       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/openvpn-as-exporter:latest-arm64"
 

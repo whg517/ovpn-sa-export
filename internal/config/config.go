@@ -63,7 +63,7 @@ func Load(configFile string) (*Config, error) {
 	v.SetDefault("log.format", "json")
 
 	// Environment variables (always loaded)
-	v.SetEnvPrefix("OVPN_SA")
+	v.SetEnvPrefix("OPENVPN_AS_EXPORTER")
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	v.AutomaticEnv()
 

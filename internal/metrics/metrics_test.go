@@ -7,7 +7,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/testutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/whg517/ovpn-sa-export/pkg/types"
+	"github.com/whg517/openvpn-as-exporter/pkg/types"
 )
 
 func TestNewRegistry(t *testing.T) {

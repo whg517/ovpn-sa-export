@@ -14,7 +14,7 @@ OpenVPN Access Server Prometheus Metrics Exporter. Collects VPN metrics via loca
 ## Project Structure
 
 ```
-cmd/ovpn-sa-export/     # Entry point
+cmd/openvpn-as-exporter/     # Entry point
 internal/
   backend/sacli/         # sacli command execution and JSON parsing
   collector/             # Orchestrates collection and metric updates

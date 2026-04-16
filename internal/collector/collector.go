@@ -6,9 +6,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/whg517/ovpn-sa-export/internal/config"
-	"github.com/whg517/ovpn-sa-export/internal/metrics"
-	"github.com/whg517/ovpn-sa-export/pkg/types"
+	"github.com/whg517/openvpn-as-exporter/internal/config"
+	"github.com/whg517/openvpn-as-exporter/internal/metrics"
+	"github.com/whg517/openvpn-as-exporter/pkg/types"
 )
 
 // Collector coordinates periodic data collection from a backend.

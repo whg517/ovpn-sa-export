@@ -8,8 +8,8 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/stretchr/testify/assert"
-	"github.com/whg517/ovpn-sa-export/internal/config"
-	"github.com/whg517/ovpn-sa-export/internal/metrics"
+	"github.com/whg517/openvpn-as-exporter/internal/config"
+	"github.com/whg517/openvpn-as-exporter/internal/metrics"
 )
 
 func newTestServer(t *testing.T) (*Server, *metrics.Registry) {
@@ -86,5 +86,5 @@ func TestMetricsEndpoint(t *testing.T) {
 	handler.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
-	assert.True(t, strings.Contains(w.Body.String(), "ovpn_sa_export_"))
+	assert.True(t, strings.Contains(w.Body.String(), "openvpn_as_exporter_"))
 }

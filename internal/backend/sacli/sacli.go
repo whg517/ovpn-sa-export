@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/whg517/ovpn-sa-export/pkg/types"
+	"github.com/whg517/openvpn-as-exporter/pkg/types"
 )
 
 // Config holds sacli backend configuration.

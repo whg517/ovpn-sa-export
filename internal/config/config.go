@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -61,26 +62,16 @@ func Load(configFile string) (*Config, error) {
 	v.SetDefault("log.level", "info")
 	v.SetDefault("log.format", "json")
 
-	// Config file
-	if configFile != "" {
-		v.SetConfigFile(configFile)
-	} else {
-		v.SetConfigName("ovpn-sa-export")
-		v.SetConfigType("yaml")
-		v.AddConfigPath("/etc/ovpn-sa-export")
-		v.AddConfigPath(".")
-		v.AddConfigPath("$HOME/.ovpn-sa-export")
-	}
-
-	// Environment variables
+	// Environment variables (always loaded)
 	v.SetEnvPrefix("OVPN_SA")
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	v.AutomaticEnv()
 
-	// Read config file (optional)
-	if err := v.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			return nil, err
+	// Config file (only when explicitly provided)
+	if configFile != "" {
+		v.SetConfigFile(configFile)
+		if err := v.ReadInConfig(); err != nil {
+			return nil, fmt.Errorf("parse config file %s: %w", configFile, err)
 		}
 	}
 

@@ -50,7 +50,7 @@ docker run -d \
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-version` | — | Print version, commit, build time, Go version and exit |
-| `-config` | auto-detect | Path to YAML config file. If not specified, searches `./ovpn-sa-export.yaml` → `/etc/ovpn-sa-export/` → `~/.ovpn-sa-export/`. If no config found, all defaults are used. |
+| `-config` | — | Path to YAML config file. If not specified, all defaults are used (no file search). |
 | `-h` | — | Show help |
 
 ## Configuration

@@ -1,1 +1,3 @@
-last_successful_update=notanumber
+{
+  "last_successful_update": "not-a-number"
+}

@@ -50,20 +50,27 @@ func TestParseVPNStatus_MultipleClients(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, clients, 2)
 
-	// user1
-	assert.Equal(t, "user1", clients[0].CommonName)
-	assert.Equal(t, "1.2.3.4:55555", clients[0].RealAddress)
-	assert.Equal(t, "172.27.228.2", clients[0].VirtualAddress)
-	assert.Equal(t, "::1", clients[0].VirtualIPv6Addr)
-	assert.Equal(t, int64(123456), clients[0].BytesReceived)
-	assert.Equal(t, int64(789012), clients[0].BytesSent)
-	assert.Equal(t, time.Unix(1712000000, 0), clients[0].ConnectedSince)
-	assert.Equal(t, 1, clients[0].ClientID)
-	assert.Equal(t, 0, clients[0].PeerID)
+	// kimi.fang
+	assert.Equal(t, "kimi.fang", clients[0].CommonName)
+	assert.Equal(t, "203.0.113.1:11991", clients[0].RealAddress)
+	assert.Equal(t, "172.31.31.59", clients[0].VirtualAddress)
+	assert.Equal(t, "", clients[0].VirtualIPv6Addr)
+	assert.Equal(t, int64(4720051), clients[0].BytesReceived)
+	assert.Equal(t, int64(15260167), clients[0].BytesSent)
+	assert.Equal(t, time.Unix(1776316170, 0), clients[0].ConnectedSince)
+	assert.Equal(t, "kimi.fang", clients[0].Username)
+	assert.Equal(t, 8716, clients[0].ClientID)
+	assert.Equal(t, 7, clients[0].PeerID)
+	assert.Equal(t, "AES-256-GCM", clients[0].Cipher)
 
-	// user2
-	assert.Equal(t, "user2", clients[1].CommonName)
-	assert.Equal(t, int64(100), clients[1].BytesReceived)
+	// john.doe
+	assert.Equal(t, "john.doe", clients[1].CommonName)
+	assert.Equal(t, "203.0.113.2:15747", clients[1].RealAddress)
+	assert.Equal(t, "172.31.31.34", clients[1].VirtualAddress)
+	assert.Equal(t, int64(72997), clients[1].BytesReceived)
+	assert.Equal(t, int64(350987), clients[1].BytesSent)
+	assert.Equal(t, time.Unix(1776332601, 0), clients[1].ConnectedSince)
+	assert.Equal(t, "AES-256-GCM", clients[1].Cipher)
 }
 
 func TestParseVPNStatus_Empty(t *testing.T) {
@@ -77,18 +84,13 @@ func TestParseVPNStatus_InvalidTimestamp(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, clients, 1)
 	assert.True(t, clients[0].ConnectedSince.IsZero())
+	assert.Equal(t, "203.0.113.1:50000", clients[0].RealAddress)
 }
 
-func TestParseVPNStatus_TooFewFields(t *testing.T) {
-	clients, err := parseVPNStatus(fixture(t, "vpn_status_too_few_fields.txt"))
-	require.NoError(t, err)
-	assert.Len(t, clients, 0)
-}
-
-func TestParseVPNStatus_WhitespaceLines(t *testing.T) {
-	clients, err := parseVPNStatus(fixture(t, "vpn_status_whitespace.txt"))
-	require.NoError(t, err)
-	assert.Len(t, clients, 1)
+func TestParseVPNStatus_InvalidJSON(t *testing.T) {
+	_, err := parseVPNStatus("not json at all")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "parse VPNStatus JSON")
 }
 
 // --- VPNSummary Parser Tests ---
@@ -115,6 +117,11 @@ func TestParseVPNSummary_Empty(t *testing.T) {
 	assert.False(t, s.OvpnDcoAvailable)
 }
 
+func TestParseVPNSummary_InvalidJSON(t *testing.T) {
+	_, err := parseVPNSummary("not json")
+	assert.Error(t, err)
+}
+
 // --- SubscriptionStatus Parser Tests ---
 
 func TestParseSubscriptionStatus(t *testing.T) {
@@ -124,7 +131,7 @@ func TestParseSubscriptionStatus(t *testing.T) {
 	assert.Equal(t, 50, s.MaxConnections)
 	assert.Equal(t, 2, s.FallbackConnections)
 	assert.Equal(t, "ACTIVE", s.State)
-	assert.Equal(t, time.Unix(1712000000, 0), s.LastSuccessfulUpdate)
+	assert.Equal(t, time.Unix(1776316170, 0), s.LastSuccessfulUpdate)
 }
 
 func TestParseSubscriptionStatus_AlternateKeys(t *testing.T) {
@@ -146,6 +153,11 @@ func TestParseSubscriptionStatus_Empty(t *testing.T) {
 	assert.Equal(t, 0, s.CurrentConnections)
 }
 
+func TestParseSubscriptionStatus_InvalidJSON(t *testing.T) {
+	_, err := parseSubscriptionStatus("not json")
+	assert.Error(t, err)
+}
+
 // --- ServiceStatus Parser Tests ---
 
 func TestParseServiceStatus(t *testing.T) {
@@ -163,26 +175,9 @@ func TestParseServiceStatus_Empty(t *testing.T) {
 	assert.Len(t, s.Services, 0)
 }
 
-// --- Helper Function Tests ---
-
-func TestGetFieldValue(t *testing.T) {
-	fields := []string{"A", "B", "C"}
-	headerMap := map[string]int{"A": 0, "B": 1, "C": 2}
-
-	assert.Equal(t, "A", getFieldValue(fields, headerMap, "A"))
-	assert.Equal(t, "B", getFieldValue(fields, headerMap, "X", "B"))
-	assert.Equal(t, "", getFieldValue(fields, headerMap, "NONEXISTENT"))
-}
-
-func TestParseInt(t *testing.T) {
-	assert.Equal(t, 42, parseInt("42"))
-	assert.Equal(t, 0, parseInt("abc"))
-	assert.Equal(t, 0, parseInt(""))
-}
-
-func TestParseInt64(t *testing.T) {
-	assert.Equal(t, int64(42), parseInt64("42"))
-	assert.Equal(t, int64(0), parseInt64("abc"))
+func TestParseServiceStatus_InvalidJSON(t *testing.T) {
+	_, err := parseServiceStatus("not json")
+	assert.Error(t, err)
 }
 
 // --- Integration Tests: Collect* with FixtureRunner ---
@@ -192,8 +187,8 @@ func TestCollectVPNStatus_Integration(t *testing.T) {
 	clients, err := b.CollectVPNStatus(context.Background())
 	require.NoError(t, err)
 	require.Len(t, clients, 2)
-	assert.Equal(t, "user1", clients[0].CommonName)
-	assert.Equal(t, "user2", clients[1].CommonName)
+	assert.Equal(t, "kimi.fang", clients[0].CommonName)
+	assert.Equal(t, "john.doe", clients[1].CommonName)
 }
 
 func TestCollectVPNSummary_Integration(t *testing.T) {
@@ -264,4 +259,25 @@ func TestCollectContextCancelled(t *testing.T) {
 	})
 	_, err := b.CollectVPNStatus(ctx)
 	assert.Error(t, err)
+}
+
+// --- JSON Helper Tests ---
+
+func TestJsonHelpers(t *testing.T) {
+	row := []interface{}{"hello", "123", float64(456), "789"}
+	header := map[string]float64{"Name": 0, "Count": 1, "Value": 2, "StrNum": 3}
+
+	assert.Equal(t, "hello", jsonStr(row, header["Name"]))
+	assert.Equal(t, int64(456), jsonInt64(row, header["Value"]))
+	assert.Equal(t, float64(456), jsonFloat(row, header["Value"]))
+
+	// String-as-number
+	assert.Equal(t, int64(123), jsonInt64(row, header["Count"]))
+	assert.Equal(t, int64(789), jsonInt64(row, header["StrNum"]))
+}
+
+func TestJsonHelpersOutOfRange(t *testing.T) {
+	row := []interface{}{"a"}
+	assert.Equal(t, "", jsonStr(row, 5))
+	assert.Equal(t, int64(0), jsonInt64(row, 5))
 }

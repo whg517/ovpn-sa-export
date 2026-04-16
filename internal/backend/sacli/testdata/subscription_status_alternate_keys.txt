@@ -1,5 +1,7 @@
-CurrentCc=5
-MaxCc=25
-FallbackCc=1
-LastSuccessfulUpdate=1712000000
-State=ACTIVE
+{
+  "current_cc": 5,
+  "max_cc": 25,
+  "fallback_cc": 1,
+  "last_successful_update": 1776316170,
+  "state": "ACTIVE"
+}

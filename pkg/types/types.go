@@ -14,6 +14,7 @@ type VPNClientStatus struct {
 	ConnectedSince  time.Time
 	ClientID        int
 	PeerID          int
+	Cipher          string
 }
 
 // VPNSummary represents the overall VPN status summary.

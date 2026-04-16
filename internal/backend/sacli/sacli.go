@@ -2,10 +2,9 @@ package sacli
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os/exec"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/whg517/ovpn-sa-export/pkg/types"
@@ -102,62 +101,63 @@ func (b *Backend) run(ctx context.Context, args ...string) (string, error) {
 	return b.runFn(ctx, b.path, args...)
 }
 
+// --- JSON response types ---
 
+// vpnStatusResponse is the JSON output of "sacli VPNStatus".
+type vpnStatusResponse map[string]vpnDaemonStatus
+
+type vpnDaemonStatus struct {
+	ClientList      [][]interface{}          `json:"client_list"`
+	ClientListHeader map[string]float64      `json:"client_list_header"`
+	GlobalStats     map[string]string       `json:"global_stats"`
+	RoutingTable    [][]interface{}          `json:"routing_table"`
+	RoutingTableHeader map[string]float64   `json:"routing_table_header"`
+	Time            []string                `json:"time"`
+	Title           string                  `json:"title"`
+}
 
 // --- Parsers ---
 
 func parseVPNStatus(output string) ([]types.VPNClientStatus, error) {
-	// sacli VPNStatus output format:
-	//   OpenVPN daemon: openvpn0 (TCP)
-	//   CLIENT_LIST   Common Name    Real Address    Virtual Address    ...
-	//   CLIENT_LIST   user1    1.2.3.4:55555    172.27.228.2    ...
+	var resp vpnStatusResponse
+	if err := json.Unmarshal([]byte(output), &resp); err != nil {
+		return nil, fmt.Errorf("parse VPNStatus JSON: %w", err)
+	}
+
 	var clients []types.VPNClientStatus
-	lines := strings.Split(output, "\n")
 
-	var headers []string
-	var headerIdx = -1
-
-	for _, line := range lines {
-		line = strings.TrimSpace(line)
-		if line == "" {
-			continue
-		}
-
-		if strings.HasPrefix(line, "CLIENT_LIST") {
-			fields := strings.Split(line, "	")
-			if len(fields) < 11 {
+	for _, daemon := range resp {
+		header := daemon.ClientListHeader
+		for _, row := range daemon.ClientList {
+			if len(row) < 11 {
 				continue
 			}
-
-			if headerIdx < 0 {
-				// First CLIENT_LIST is the header row
-				headers = fields
-				headerIdx = 0
-				continue
-			}
-
-			// Build header-to-index mapping
-			headerMap := make(map[string]int)
-			for i, h := range headers {
-				headerMap[h] = i
-			}
-
 			client := types.VPNClientStatus{
-				CommonName:      getFieldValue(fields, headerMap, "Common Name", "COMMON_NAME"),
-				Username:        getFieldValue(fields, headerMap, "Username", "USERNAME"),
-				RealAddress:     getFieldValue(fields, headerMap, "Real Address", "REAL_ADDRESS"),
-				VirtualAddress:  getFieldValue(fields, headerMap, "Virtual Address", "VIRTUAL_ADDRESS"),
-				VirtualIPv6Addr: getFieldValue(fields, headerMap, "Virtual IPv6 Address", "VIRTUAL_IPV6_ADDRESS"),
-				BytesReceived:   parseInt64(getFieldValue(fields, headerMap, "Bytes Received", "BYTES_RECEIVED")),
-				BytesSent:       parseInt64(getFieldValue(fields, headerMap, "Bytes Sent", "BYTES_SENT")),
-				ClientID:        parseInt(getFieldValue(fields, headerMap, "Client ID", "CLIENT_ID")),
-				PeerID:          parseInt(getFieldValue(fields, headerMap, "Peer ID", "PEER_ID")),
+				CommonName:     jsonStr(row, header["Common Name"]),
+				RealAddress:    jsonStr(row, header["Real Address"]),
+				VirtualAddress: jsonStr(row, header["Virtual Address"]),
+				BytesReceived:  jsonInt64(row, header["Bytes Received"]),
+				BytesSent:      jsonInt64(row, header["Bytes Sent"]),
+				ClientID:       int(jsonFloat(row, header["Client ID"])),
+				PeerID:         int(jsonFloat(row, header["Peer ID"])),
 			}
 
-			if ts := getFieldValue(fields, headerMap, "Connected Since (time_t)", "CONNECTED_SINCE"); ts != "" {
-				if sec, err := strconv.ParseInt(ts, 10, 64); err == nil {
+			if idx, ok := header["Connected Since (time_t)"]; ok {
+				if sec, err := jsonInt64At(row, int(idx)); err == nil {
 					client.ConnectedSince = time.Unix(sec, 0)
 				}
+			}
+
+			if idx, ok := header["Username"]; ok {
+				client.Username = jsonStrAt(row, int(idx))
+			}
+
+			if idx, ok := header["Virtual IPv6 Address"]; ok {
+				client.VirtualIPv6Addr = jsonStrAt(row, int(idx))
+			}
+
+			if idx, ok := header["Data Channel Cipher"]; ok {
+				client.Cipher = jsonStrAt(row, int(idx))
 			}
 
 			clients = append(clients, client)
@@ -167,90 +167,128 @@ func parseVPNStatus(output string) ([]types.VPNClientStatus, error) {
 	return clients, nil
 }
 
-func getFieldValue(fields []string, headerMap map[string]int, keys ...string) string {
-	for _, key := range keys {
-		if idx, ok := headerMap[key]; ok && idx < len(fields) {
-			return fields[idx]
-		}
-	}
-	return ""
-}
-
-func parseInt(s string) int {
-	n, _ := strconv.Atoi(s)
-	return n
-}
-
-func parseInt64(s string) int64 {
-	return int64(parseInt(s))
-}
-
 func parseVPNSummary(output string) (*types.VPNSummary, error) {
+	var raw map[string]interface{}
+	if err := json.Unmarshal([]byte(output), &raw); err != nil {
+		return nil, fmt.Errorf("parse VPNSummary JSON: %w", err)
+	}
+
 	summary := &types.VPNSummary{}
-	for _, line := range strings.Split(output, "\n") {
-		line = strings.TrimSpace(line)
-		if strings.HasPrefix(line, "n_clients") {
-			parts := strings.SplitN(line, "=", 2)
-			if len(parts) == 2 {
-				summary.NClients = parseInt(parts[1])
-			}
-		}
-		if strings.HasPrefix(line, "ovpn_dco_available") {
-			parts := strings.SplitN(line, "=", 2)
-			if len(parts) == 2 {
-				summary.OvpnDcoAvailable = parts[1] == "true"
-			}
-		}
-		if strings.HasPrefix(line, "ovpn_dco_ver") {
-			parts := strings.SplitN(line, "=", 2)
-			if len(parts) == 2 {
-				summary.OvpnDcoVersion = parts[1]
-			}
-		}
+	if v, ok := raw["n_clients"]; ok {
+		summary.NClients = int(jsonToFloat64(v))
+	}
+	if v, ok := raw["ovpn_dco_available"]; ok {
+		summary.OvpnDcoAvailable = v == true || v == "true"
+	}
+	if v, ok := raw["ovpn_dco_ver"]; ok {
+		summary.OvpnDcoVersion = fmt.Sprintf("%v", v)
 	}
 	return summary, nil
 }
 
 func parseSubscriptionStatus(output string) (*types.SubscriptionStatus, error) {
+	var raw map[string]interface{}
+	if err := json.Unmarshal([]byte(output), &raw); err != nil {
+		return nil, fmt.Errorf("parse SubscriptionStatus JSON: %w", err)
+	}
+
 	status := &types.SubscriptionStatus{}
-	for _, line := range strings.Split(output, "\n") {
-		line = strings.TrimSpace(line)
-		if !strings.Contains(line, "=") {
-			continue
-		}
-		parts := strings.SplitN(line, "=", 2)
-		if len(parts) != 2 {
-			continue
-		}
-		switch parts[0] {
-		case "current_cc", "CurrentCc":
-			status.CurrentConnections = parseInt(parts[1])
-		case "max_cc", "MaxCc":
-			status.MaxConnections = parseInt(parts[1])
-		case "fallback_cc", "FallbackCc":
-			status.FallbackConnections = parseInt(parts[1])
-		case "last_successful_update", "LastSuccessfulUpdate":
-			if sec, err := strconv.ParseInt(parts[1], 10, 64); err == nil {
-				status.LastSuccessfulUpdate = time.Unix(sec, 0)
-			}
-		case "state", "State":
-			status.State = parts[1]
+	if v, ok := raw["current_cc"]; ok {
+		status.CurrentConnections = int(jsonToFloat64(v))
+	}
+	if v, ok := raw["max_cc"]; ok {
+		status.MaxConnections = int(jsonToFloat64(v))
+	}
+	if v, ok := raw["fallback_cc"]; ok {
+		status.FallbackConnections = int(jsonToFloat64(v))
+	}
+	if v, ok := raw["state"]; ok {
+		status.State = fmt.Sprintf("%v", v)
+	}
+	if v, ok := raw["last_successful_update"]; ok {
+		if sec := int64(jsonToFloat64(v)); sec > 0 {
+			status.LastSuccessfulUpdate = time.Unix(sec, 0)
 		}
 	}
 	return status, nil
 }
 
 func parseServiceStatus(output string) (*types.ServiceStatus, error) {
+	var raw map[string]interface{}
+	if err := json.Unmarshal([]byte(output), &raw); err != nil {
+		return nil, fmt.Errorf("parse status JSON: %w", err)
+	}
+
 	services := make(map[string]bool)
-	for _, line := range strings.Split(output, "\n") {
-		line = strings.TrimSpace(line)
-		// sacli status output: "service_name: running" or "service_name: stopped"
-		parts := strings.SplitN(line, ":", 2)
-		if len(parts) == 2 {
-			name := strings.TrimSpace(parts[0])
-			state := strings.TrimSpace(parts[1])
-			services[name] = strings.Contains(strings.ToLower(state), "running")
-		}
+	for name, val := range raw {
+		// sacli status returns values like "running", "stopped"
+		state := fmt.Sprintf("%v", val)
+		services[name] = state == "running"
 	}
 	return &types.ServiceStatus{Services: services}, nil
+}
+
+// --- JSON helpers ---
+
+func jsonStr(row []interface{}, idx float64) string {
+	return jsonStrAt(row, int(idx))
+}
+
+func jsonStrAt(row []interface{}, idx int) string {
+	if idx >= 0 && idx < len(row) {
+		if s, ok := row[idx].(string); ok {
+			return s
+		}
+	}
+	return ""
+}
+
+func jsonInt64(row []interface{}, idx float64) int64 {
+	v, _ := jsonInt64At(row, int(idx))
+	return v
+}
+
+func jsonInt64At(row []interface{}, idx int) (int64, error) {
+	if idx >= 0 && idx < len(row) {
+		switch v := row[idx].(type) {
+		case string:
+			var n int64
+			_, err := fmt.Sscanf(v, "%d", &n)
+			return n, err
+		case float64:
+			return int64(v), nil
+		}
+	}
+	return 0, fmt.Errorf("index %d out of range or invalid type", idx)
+}
+
+func jsonFloat(row []interface{}, idx float64) float64 {
+	i := int(idx)
+	if i >= 0 && i < len(row) {
+		switch v := row[i].(type) {
+		case float64:
+			return v
+		case string:
+			var f float64
+			fmt.Sscanf(v, "%f", &f)
+			return f
+		}
+	}
+	return 0
+}
+
+func jsonToFloat64(v interface{}) float64 {
+	switch val := v.(type) {
+	case float64:
+		return val
+	case string:
+		var f float64
+		fmt.Sscanf(val, "%f", &f)
+		return f
+	case int:
+		return float64(val)
+	case int64:
+		return float64(val)
+	}
+	return 0
 }

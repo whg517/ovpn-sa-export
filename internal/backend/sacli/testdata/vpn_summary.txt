@@ -1,3 +1,5 @@
-n_clients=5
-ovpn_dco_available=true
-ovpn_dco_ver=v2
+{
+  "n_clients": 5,
+  "ovpn_dco_available": true,
+  "ovpn_dco_ver": "v2"
+}

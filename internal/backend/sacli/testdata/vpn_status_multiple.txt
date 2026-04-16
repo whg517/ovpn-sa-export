@@ -1,4 +1,73 @@
-OpenVPN daemon: openvpn0 (TCP)
-CLIENT_LIST	Common Name	Real Address	Virtual Address	Virtual IPv6 Address	Bytes Received	Bytes Sent	Connected Since (time_t)	Username	Client ID	Peer ID
-CLIENT_LIST	user1	1.2.3.4:55555	172.27.228.2	::1	123456	789012	1712000000	user1	1	0
-CLIENT_LIST	user2	5.6.7.8:12345	172.27.228.3	::2	100	200	1712001000	user2	2	1
+{
+  "openvpn_0": {
+    "client_list": [
+      [
+        "kimi.fang",
+        "203.0.113.1:11991",
+        "172.31.31.59",
+        "",
+        "4720051",
+        "15260167",
+        "2026-04-16 05:09:30",
+        "1776316170",
+        "kimi.fang",
+        "8716",
+        "7",
+        "AES-256-GCM"
+      ],
+      [
+        "john.doe",
+        "203.0.113.2:15747",
+        "172.31.31.34",
+        "",
+        "72997",
+        "350987",
+        "2026-04-16 09:43:21",
+        "1776332601",
+        "john.doe",
+        "8770",
+        "6",
+        "AES-256-GCM"
+      ]
+    ],
+    "client_list_header": {
+      "Bytes Received": 4,
+      "Bytes Sent": 5,
+      "Client ID": 9,
+      "Common Name": 0,
+      "Connected Since": 6,
+      "Connected Since (time_t)": 7,
+      "Data Channel Cipher": 11,
+      "Peer ID": 10,
+      "Real Address": 1,
+      "Username": 8,
+      "Virtual Address": 2,
+      "Virtual IPv6 Address": 3
+    },
+    "global_stats": {
+      "Max bcast/mcast queue length": "23",
+      "dco_enabled": "0"
+    },
+    "routing_table": [
+      [
+        "172.31.31.17",
+        "qiang.zhang",
+        "203.0.113.3:63370",
+        "2026-04-16 10:04:09",
+        "1776333849"
+      ]
+    ],
+    "routing_table_header": {
+      "Common Name": 1,
+      "Last Ref": 3,
+      "Last Ref (time_t)": 4,
+      "Real Address": 2,
+      "Virtual Address": 0
+    },
+    "time": [
+      "2026-04-16 11:27:56",
+      "1776338876"
+    ],
+    "title": "OpenVPN 2.6.8 x86_64-unknown-linux-gnu [SSL (OpenSSL)] [LZO] [LZ4] [EPOLL] [MH/PKTINFO] [AEAD]"
+  }
+}

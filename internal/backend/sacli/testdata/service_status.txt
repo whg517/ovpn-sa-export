@@ -1,4 +1,6 @@
-OPENVPN: running
-AUTH: running
-WEB: stopped
-AGENT: running
+{
+  "OPENVPN": "running",
+  "AUTH": "running",
+  "WEB": "stopped",
+  "AGENT": "running"
+}

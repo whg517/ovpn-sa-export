@@ -1,3 +1,5 @@
-n_clients=0
-ovpn_dco_available=false
-ovpn_dco_ver=
+{
+  "n_clients": 0,
+  "ovpn_dco_available": false,
+  "ovpn_dco_ver": ""
+}

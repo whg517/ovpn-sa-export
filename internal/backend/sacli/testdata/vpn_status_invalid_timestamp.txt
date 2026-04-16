@@ -1,2 +1,42 @@
-CLIENT_LIST	Common Name	Real Address	Virtual Address	Virtual IPv6 Address	Bytes Received	Bytes Sent	Connected Since (time_t)	Username	Client ID	Peer ID
-CLIENT_LIST	u1	1.1.1.1	10.0.0.1	::1	100	200	notatimestamp	u1	1	0
+{
+  "openvpn_0": {
+    "client_list": [
+      [
+        "user1",
+        "203.0.113.1:50000",
+        "172.31.31.100",
+        "",
+        "100",
+        "200",
+        "not-a-timestamp",
+        "INVALID",
+        "user1",
+        "1",
+        "0",
+        "AES-256-GCM"
+      ]
+    ],
+    "client_list_header": {
+      "Bytes Received": 4,
+      "Bytes Sent": 5,
+      "Client ID": 9,
+      "Common Name": 0,
+      "Connected Since": 6,
+      "Connected Since (time_t)": 7,
+      "Data Channel Cipher": 11,
+      "Peer ID": 10,
+      "Real Address": 1,
+      "Username": 8,
+      "Virtual Address": 2,
+      "Virtual IPv6 Address": 3
+    },
+    "global_stats": {},
+    "routing_table": [],
+    "routing_table_header": {},
+    "time": [
+      "2026-04-16 12:00:00",
+      "1776340800"
+    ],
+    "title": "OpenVPN 2.6.8"
+  }
+}

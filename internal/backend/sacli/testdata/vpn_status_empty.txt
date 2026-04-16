@@ -1,2 +1,36 @@
-OpenVPN daemon: openvpn0 (TCP)
-CLIENT_LIST	Common Name	Real Address	Virtual Address	Virtual IPv6 Address	Bytes Received	Bytes Sent	Connected Since (time_t)	Username	Client ID	Peer ID
+{
+  "openvpn_0": {
+    "client_list": [],
+    "client_list_header": {
+      "Bytes Received": 4,
+      "Bytes Sent": 5,
+      "Client ID": 9,
+      "Common Name": 0,
+      "Connected Since": 6,
+      "Connected Since (time_t)": 7,
+      "Data Channel Cipher": 11,
+      "Peer ID": 10,
+      "Real Address": 1,
+      "Username": 8,
+      "Virtual Address": 2,
+      "Virtual IPv6 Address": 3
+    },
+    "global_stats": {
+      "Max bcast/mcast queue length": "0",
+      "dco_enabled": "0"
+    },
+    "routing_table": [],
+    "routing_table_header": {
+      "Common Name": 1,
+      "Last Ref": 3,
+      "Last Ref (time_t)": 4,
+      "Real Address": 2,
+      "Virtual Address": 0
+    },
+    "time": [
+      "2026-04-16 12:00:00",
+      "1776340800"
+    ],
+    "title": "OpenVPN 2.6.8 x86_64-unknown-linux-gnu [SSL (OpenSSL)] [LZO] [LZ4] [EPOLL] [MH/PKTINFO] [AEAD]"
+  }
+}

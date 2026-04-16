@@ -98,9 +98,9 @@ func TestParseVPNStatus_InvalidJSON(t *testing.T) {
 func TestParseVPNSummary_WithDCO(t *testing.T) {
 	s, err := parseVPNSummary(fixture(t, "vpn_summary.txt"))
 	require.NoError(t, err)
-	assert.Equal(t, 5, s.NClients)
-	assert.True(t, s.OvpnDcoAvailable)
-	assert.Equal(t, "v2", s.OvpnDcoVersion)
+	assert.Equal(t, 25, s.NClients)
+	assert.False(t, s.OvpnDcoAvailable)
+	assert.Equal(t, "Kernel module not loaded", s.OvpnDcoVersion)
 }
 
 func TestParseVPNSummary_NoDCO(t *testing.T) {
@@ -140,16 +140,34 @@ func TestToJSON_StandardJSON(t *testing.T) {
 func TestParseServiceStatus(t *testing.T) {
 	s, err := parseServiceStatus(fixture(t, "service_status.txt"))
 	require.NoError(t, err)
-	assert.True(t, s.Services["OPENVPN"])
-	assert.True(t, s.Services["AUTH"])
-	assert.False(t, s.Services["WEB"])
-	assert.True(t, s.Services["AGENT"])
+
+	assert.Equal(t, "Default", s.ActiveProfile)
+	assert.Equal(t, "Thu Apr  9 14:23:14 2026", s.LastRestarted)
+	assert.False(t, s.DCOAvailable)
+	assert.Equal(t, "Kernel module not loaded", s.DCOVersion)
+
+	// Service status (on/off)
+	assert.True(t, s.ServiceStatus["api"])
+	assert.True(t, s.ServiceStatus["auth"])
+	assert.True(t, s.ServiceStatus["openvpn_0"])
+	assert.True(t, s.ServiceStatus["web"])
+	assert.Len(t, s.ServiceStatus, 18)
+
+	// Auth modules (enabled/disabled)
+	assert.True(t, s.AuthModulesStatus["local"])
+	assert.True(t, s.AuthModulesStatus["pam"])
+	assert.False(t, s.AuthModulesStatus["ldap"])
+	assert.False(t, s.AuthModulesStatus["radius"])
+
+	// Errors empty
+	assert.Len(t, s.Errors, 0)
 }
 
 func TestParseServiceStatus_Empty(t *testing.T) {
 	s, err := parseServiceStatus(fixture(t, "empty.txt"))
 	require.NoError(t, err)
-	assert.Len(t, s.Services, 0)
+	assert.Len(t, s.ServiceStatus, 0)
+	assert.Equal(t, "", s.ActiveProfile)
 }
 
 func TestParseServiceStatus_InvalidJSON(t *testing.T) {
@@ -172,16 +190,17 @@ func TestCollectVPNSummary_Integration(t *testing.T) {
 	b := NewWithRunner(Config{}, fixtureRunner(t, "vpn_summary.txt"))
 	s, err := b.CollectVPNSummary(context.Background())
 	require.NoError(t, err)
-	assert.Equal(t, 5, s.NClients)
-	assert.True(t, s.OvpnDcoAvailable)
+	assert.Equal(t, 25, s.NClients)
+	assert.False(t, s.OvpnDcoAvailable)
 }
 
 func TestCollectServiceStatus_Integration(t *testing.T) {
 	b := NewWithRunner(Config{}, fixtureRunner(t, "service_status.txt"))
 	s, err := b.CollectServiceStatus(context.Background())
 	require.NoError(t, err)
-	assert.True(t, s.Services["OPENVPN"])
-	assert.False(t, s.Services["WEB"])
+	assert.True(t, s.ServiceStatus["api"])
+	assert.True(t, s.ServiceStatus["openvpn_0"])
+	assert.Equal(t, "Default", s.ActiveProfile)
 }
 
 // --- Error Path Tests ---

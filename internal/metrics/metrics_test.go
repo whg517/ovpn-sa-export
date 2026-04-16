@@ -68,11 +68,11 @@ func TestUpdateVPNSummary(t *testing.T) {
 func TestUpdateServiceStatus(t *testing.T) {
 	r := NewRegistry()
 	r.UpdateServiceStatus(&types.ServiceStatus{
-		Services: map[string]bool{"OPENVPN": true, "WEB": false},
+		ServiceStatus: map[string]bool{"openvpn_0": true, "web": false},
 	})
 
-	assert.Equal(t, 1.0, testutil.ToFloat64(r.serviceUp.WithLabelValues("OPENVPN")))
-	assert.Equal(t, 0.0, testutil.ToFloat64(r.serviceUp.WithLabelValues("WEB")))
+	assert.Equal(t, 1.0, testutil.ToFloat64(r.serviceUp.WithLabelValues("openvpn_0")))
+	assert.Equal(t, 0.0, testutil.ToFloat64(r.serviceUp.WithLabelValues("web")))
 }
 
 func TestUpdateNil(t *testing.T) {

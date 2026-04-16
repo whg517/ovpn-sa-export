@@ -148,9 +148,9 @@ func (r *Registry) UpdateServiceStatus(s *types.ServiceStatus) {
 	if s == nil {
 		return
 	}
-	for name, running := range s.Services {
+	for name, on := range s.ServiceStatus {
 		val := float64(0)
-		if running {
+		if on {
 			val = 1
 		}
 		r.serviceUp.WithLabelValues(name).Set(val)

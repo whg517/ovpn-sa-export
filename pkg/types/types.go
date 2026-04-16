@@ -19,12 +19,18 @@ type VPNClientStatus struct {
 
 // VPNSummary represents the overall VPN status summary.
 type VPNSummary struct {
-	NClients        int
-	OvpnDcoVersion  string
+	NClients         int
 	OvpnDcoAvailable bool
+	OvpnDcoVersion   string
 }
 
-// ServiceStatus represents the status of internal AS services.
+// ServiceStatus represents the sacli status output.
 type ServiceStatus struct {
-	Services map[string]bool // service_name -> running
+	ActiveProfile     string
+	LastRestarted     string
+	ServiceStatus     map[string]bool   // service_name -> on/off
+	AuthModulesStatus map[string]bool   // auth_module -> enabled/disabled
+	DCOAvailable      bool
+	DCOVersion        string
+	Errors            map[string]string
 }

@@ -1,5 +1,5 @@
 {
-  "n_clients": 5,
-  "ovpn_dco_available": true,
-  "ovpn_dco_ver": "v2"
+  "n_clients": 25,
+  "ovpn_dco_available": false,
+  "ovpn_dco_ver": "Kernel module not loaded"
 }

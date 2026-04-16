@@ -193,13 +193,53 @@ func parseServiceStatus(output string) (*types.ServiceStatus, error) {
 		return nil, fmt.Errorf("parse status JSON: %w", err)
 	}
 
-	services := make(map[string]bool)
-	for name, val := range raw {
-		// sacli status returns values like "running", "stopped"
-		state := fmt.Sprintf("%v", val)
-		services[name] = state == "running"
+	s := &types.ServiceStatus{
+		ServiceStatus:     make(map[string]bool),
+		AuthModulesStatus: make(map[string]bool),
+		Errors:            make(map[string]string),
 	}
-	return &types.ServiceStatus{Services: services}, nil
+
+	if v, ok := raw["active_profile"]; ok {
+		s.ActiveProfile = fmt.Sprintf("%v", v)
+	}
+	if v, ok := raw["last_restarted"]; ok {
+		s.LastRestarted = fmt.Sprintf("%v", v)
+	}
+
+	// service_status: {"api": "on", "auth": "on", ...}
+	if ss, ok := raw["service_status"].(map[string]interface{}); ok {
+		for name, val := range ss {
+			state := fmt.Sprintf("%v", val)
+			s.ServiceStatus[name] = state == "on"
+		}
+	}
+
+	// auth_modules_status: {"ldap": "disabled", "local": "enabled", ...}
+	if am, ok := raw["auth_modules_status"].(map[string]interface{}); ok {
+		for name, val := range am {
+			state := fmt.Sprintf("%v", val)
+			s.AuthModulesStatus[name] = state == "enabled"
+		}
+	}
+
+	// dco_module_status: {"ovpn_dco_available": false, "ovpn_dco_ver": "..."}
+	if dco, ok := raw["dco_module_status"].(map[string]interface{}); ok {
+		if v, ok := dco["ovpn_dco_available"]; ok {
+			s.DCOAvailable = v == true || v == "true"
+		}
+		if v, ok := dco["ovpn_dco_ver"]; ok {
+			s.DCOVersion = fmt.Sprintf("%v", v)
+		}
+	}
+
+	// errors: {} or map of error messages
+	if errs, ok := raw["errors"].(map[string]interface{}); ok {
+		for k, v := range errs {
+			s.Errors[k] = fmt.Sprintf("%v", v)
+		}
+	}
+
+	return s, nil
 }
 
 // --- JSON helpers ---

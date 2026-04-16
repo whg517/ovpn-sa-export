@@ -1,6 +1,37 @@
 {
-  "OPENVPN": "running",
-  "AUTH": "running",
-  "WEB": "stopped",
-  "AGENT": "running"
+  "active_profile": "Default",
+  "auth_modules_status": {
+    "ldap": "disabled",
+    "local": "enabled",
+    "pam": "enabled",
+    "pas_only": "disabled",
+    "radius": "disabled",
+    "saml": "disabled"
+  },
+  "dco_module_status": {
+    "ovpn_dco_available": false,
+    "ovpn_dco_ver": "Kernel module not loaded"
+  },
+  "errors": {},
+  "last_restarted": "Thu Apr  9 14:23:14 2026",
+  "service_status": {
+    "api": "on",
+    "auth": "on",
+    "bridge": "on",
+    "client_query": "on",
+    "crl": "on",
+    "daemon_pre": "on",
+    "db_push": "on",
+    "ip6tables_live": "on",
+    "ip6tables_openvpn": "on",
+    "iptables_api": "on",
+    "iptables_live": "on",
+    "iptables_openvpn": "on",
+    "iptables_web": "on",
+    "log": "on",
+    "openvpn_0": "on",
+    "subscription": "on",
+    "user": "on",
+    "web": "on"
+  }
 }

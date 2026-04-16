@@ -69,7 +69,7 @@ func TestCollectorStartAndStop(t *testing.T) {
 			return &types.VPNSummary{NClients: 1}, nil
 		},
 		serviceStatusFn: func(ctx context.Context) (*types.ServiceStatus, error) {
-			return &types.ServiceStatus{Services: map[string]bool{"OPENVPN": true}}, nil
+			return &types.ServiceStatus{ServiceStatus: map[string]bool{"OPENVPN": true}}, nil
 		},
 	}
 
@@ -96,7 +96,7 @@ func TestCollectorCollectAllSuccess(t *testing.T) {
 			return &types.VPNSummary{NClients: 1, OvpnDcoAvailable: true, OvpnDcoVersion: "v2"}, nil
 		},
 		serviceStatusFn: func(ctx context.Context) (*types.ServiceStatus, error) {
-			return &types.ServiceStatus{Services: map[string]bool{"OPENVPN": true, "WEB": false}}, nil
+			return &types.ServiceStatus{ServiceStatus: map[string]bool{"OPENVPN": true, "WEB": false}}, nil
 		},
 	}
 
@@ -175,7 +175,7 @@ func TestCollectorEmptyClients(t *testing.T) {
 			return &types.VPNSummary{NClients: 0}, nil
 		},
 		serviceStatusFn: func(ctx context.Context) (*types.ServiceStatus, error) {
-			return &types.ServiceStatus{Services: map[string]bool{}}, nil
+			return &types.ServiceStatus{ServiceStatus: map[string]bool{}}, nil
 		},
 	}
 
@@ -227,7 +227,7 @@ func TestCollectorRecordScrapeMetrics(t *testing.T) {
 			return &types.VPNSummary{NClients: 1}, nil
 		},
 		serviceStatusFn: func(ctx context.Context) (*types.ServiceStatus, error) {
-			return &types.ServiceStatus{Services: map[string]bool{"X": true}}, nil
+			return &types.ServiceStatus{ServiceStatus: map[string]bool{"X": true}}, nil
 		},
 	}
 

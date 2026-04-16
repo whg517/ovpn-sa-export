@@ -10,9 +10,41 @@ permissions:
   packages: write
 
 jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.64.8
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test -race -count=1 -v ./...
+
   release:
     name: Release
     runs-on: ubuntu-latest
+    needs: [lint, test]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -43,31 +75,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GOVERSION: ${{ env.GOVERSION }}
-          # Uncomment below when homebrew/scoop tap repos are created:
-          # HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
-          # SCOOP_BUCKET_GITHUB_TOKEN: ${{ secrets.SCOOP_BUCKET_GITHUB_TOKEN }}
-
-  # Quick validation: push a test snapshot build without creating a release
-  # Trigger manually or on main push (commented out by default)
-  # Uncomment the snapshot job below to enable snapshot builds on main pushes.
-  #
-  # snapshot:
-  #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-  #   name: Snapshot
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #       with:
-  #         fetch-depth: 0
-  #     - uses: actions/setup-go@v5
-  #       with:
-  #         go-version: "1.24"
-  #     - run: echo "GOVERSION=$(go version | awk '{print $3}')" >> "$GITHUB_ENV"
-  #     - uses: goreleaser/goreleaser-action@v6
-  #       with:
-  #         distribution: goreleaser
-  #         version: "~> v2"
-  #         args: release --clean --snapshot
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #         GOVERSION: ${{ env.GOVERSION }}

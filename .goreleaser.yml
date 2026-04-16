@@ -90,30 +90,12 @@ dockers:
       - "--platform=linux/arm64"
 
 docker_manifests:
-  - image_template: "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:{{ .Version }}"
+  - name_template: "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:{{ .Version }}"
     image_templates:
       - "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:{{ .Version }}-amd64"
       - "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:{{ .Version }}-arm64"
-  - image_template: "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:latest"
+  - name_template: "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:latest"
     image_templates:
       - "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:latest-amd64"
       - "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:latest-arm64"
 
-brews:
-  - repository:
-      owner: "{{ .RepoOwner }}"
-      name: homebrew-tap
-      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
-    homepage: https://github.com/whg517/ovpn-sa-export
-    description: OpenVPN Access Server Prometheus exporter
-    install: |
-      bin.install "ovpn-sa-export"
-
-scoops:
-  - repository:
-      owner: "{{ .RepoOwner }}"
-      name: scoop-bucket
-      token: "{{ .Env.SCOOP_BUCKET_GITHUB_TOKEN }}"
-    homepage: https://github.com/whg517/ovpn-sa-export
-    description: OpenVPN Access Server Prometheus exporter
-    license: MIT

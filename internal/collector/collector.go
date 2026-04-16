@@ -26,7 +26,6 @@ type Backend interface {
 	Name() string
 	CollectVPNStatus(ctx context.Context) ([]types.VPNClientStatus, error)
 	CollectVPNSummary(ctx context.Context) (*types.VPNSummary, error)
-	CollectSubscriptionStatus(ctx context.Context) (*types.SubscriptionStatus, error)
 	CollectServiceStatus(ctx context.Context) (*types.ServiceStatus, error)
 }
 
@@ -89,7 +88,6 @@ func (c *Collector) Stop() {
 func (c *Collector) collectAll(ctx context.Context) {
 	c.collectVPNStatus(ctx)
 	c.collectVPNSummary(ctx)
-	c.collectSubscription(ctx)
 	c.collectServiceStatus(ctx)
 }
 
@@ -121,21 +119,6 @@ func (c *Collector) collectVPNSummary(ctx context.Context) {
 	}
 
 	c.registry.UpdateVPNSummary(summary)
-}
-
-func (c *Collector) collectSubscription(ctx context.Context) {
-	start := time.Now()
-	status, err := c.backend.CollectSubscriptionStatus(ctx)
-	duration := time.Since(start)
-
-	c.registry.RecordScrape("subscription", duration, err)
-
-	if err != nil {
-		slog.Error("failed to collect subscription status", "error", err, "backend", c.backend.Name())
-		return
-	}
-
-	c.registry.UpdateSubscription(status)
 }
 
 func (c *Collector) collectServiceStatus(ctx context.Context) {

@@ -80,15 +80,6 @@ func (b *Backend) CollectVPNSummary(ctx context.Context) (*types.VPNSummary, err
 	return parseVPNSummary(output)
 }
 
-// CollectSubscriptionStatus retrieves subscription status via sacli SubscriptionStatus.
-func (b *Backend) CollectSubscriptionStatus(ctx context.Context) (*types.SubscriptionStatus, error) {
-	output, err := b.run(ctx, "SubscriptionStatus")
-	if err != nil {
-		return nil, fmt.Errorf("sacli SubscriptionStatus: %w", err)
-	}
-	return parseSubscriptionStatus(output)
-}
-
 // CollectServiceStatus retrieves service status via sacli status.
 func (b *Backend) CollectServiceStatus(ctx context.Context) (*types.ServiceStatus, error) {
 	output, err := b.run(ctx, "status")
@@ -194,32 +185,7 @@ func parseVPNSummary(output string) (*types.VPNSummary, error) {
 	return summary, nil
 }
 
-func parseSubscriptionStatus(output string) (*types.SubscriptionStatus, error) {
-	var raw map[string]interface{}
-	if err := json.Unmarshal([]byte(toJSON(output)), &raw); err != nil {
-		return nil, fmt.Errorf("parse SubscriptionStatus JSON: %w", err)
-	}
-
-	status := &types.SubscriptionStatus{}
-	if v, ok := raw["current_cc"]; ok {
-		status.CurrentConnections = int(jsonToFloat64(v))
-	}
-	if v, ok := raw["max_cc"]; ok {
-		status.MaxConnections = int(jsonToFloat64(v))
-	}
-	if v, ok := raw["fallback_cc"]; ok {
-		status.FallbackConnections = int(jsonToFloat64(v))
-	}
-	if v, ok := raw["state"]; ok {
-		status.State = fmt.Sprintf("%v", v)
-	}
-	if v, ok := raw["last_successful_update"]; ok {
-		if sec := int64(jsonToFloat64(v)); sec > 0 {
-			status.LastSuccessfulUpdate = time.Unix(sec, 0)
-		}
-	}
-	return status, nil
-}
+// --- ServiceStatus Parser ---
 
 func parseServiceStatus(output string) (*types.ServiceStatus, error) {
 	var raw map[string]interface{}

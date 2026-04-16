@@ -24,15 +24,6 @@ type VPNSummary struct {
 	OvpnDcoAvailable bool
 }
 
-// SubscriptionStatus represents the license/subscription state.
-type SubscriptionStatus struct {
-	CurrentConnections  int
-	MaxConnections      int
-	FallbackConnections int
-	LastSuccessfulUpdate time.Time
-	State               string
-}
-
 // ServiceStatus represents the status of internal AS services.
 type ServiceStatus struct {
 	Services map[string]bool // service_name -> running

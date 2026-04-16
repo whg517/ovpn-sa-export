@@ -65,20 +65,6 @@ func TestUpdateVPNSummary(t *testing.T) {
 	assert.Equal(t, 1.0, testutil.ToFloat64(r.dcoAvailable))
 }
 
-func TestUpdateSubscription(t *testing.T) {
-	r := NewRegistry()
-	r.UpdateSubscription(&types.SubscriptionStatus{
-		CurrentConnections:  10,
-		MaxConnections:      50,
-		FallbackConnections: 2,
-		State:               "ACTIVE",
-	})
-
-	assert.Equal(t, 10.0, testutil.ToFloat64(r.subCurrent))
-	assert.Equal(t, 50.0, testutil.ToFloat64(r.subMax))
-	assert.Equal(t, 2.0, testutil.ToFloat64(r.subFallback))
-}
-
 func TestUpdateServiceStatus(t *testing.T) {
 	r := NewRegistry()
 	r.UpdateServiceStatus(&types.ServiceStatus{
@@ -93,6 +79,5 @@ func TestUpdateNil(t *testing.T) {
 	r := NewRegistry()
 	// Should not panic
 	r.UpdateVPNSummary(nil)
-	r.UpdateSubscription(nil)
 	r.UpdateServiceStatus(nil)
 }

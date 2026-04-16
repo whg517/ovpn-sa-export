@@ -1,7 +1,0 @@
-{
-  "current_cc": 10,
-  "max_cc": 50,
-  "fallback_cc": 2,
-  "last_successful_update": 1776316170,
-  "state": "ACTIVE"
-}

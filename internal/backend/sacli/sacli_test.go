@@ -122,49 +122,6 @@ func TestParseVPNSummary_InvalidJSON(t *testing.T) {
 	assert.Error(t, err)
 }
 
-// --- SubscriptionStatus Parser Tests ---
-
-func TestParseSubscriptionStatus(t *testing.T) {
-	s, err := parseSubscriptionStatus(fixture(t, "subscription_status.txt"))
-	require.NoError(t, err)
-	assert.Equal(t, 10, s.CurrentConnections)
-	assert.Equal(t, 50, s.MaxConnections)
-	assert.Equal(t, 2, s.FallbackConnections)
-	assert.Equal(t, "ACTIVE", s.State)
-	assert.Equal(t, time.Unix(1776316170, 0), s.LastSuccessfulUpdate)
-}
-
-func TestParseSubscriptionStatus_AlternateKeys(t *testing.T) {
-	s, err := parseSubscriptionStatus(fixture(t, "subscription_status_alternate_keys.txt"))
-	require.NoError(t, err)
-	assert.Equal(t, 5, s.CurrentConnections)
-	assert.Equal(t, 25, s.MaxConnections)
-}
-
-func TestParseSubscriptionStatus_InvalidUpdate(t *testing.T) {
-	s, err := parseSubscriptionStatus(fixture(t, "subscription_status_invalid_update.txt"))
-	require.NoError(t, err)
-	assert.True(t, s.LastSuccessfulUpdate.IsZero())
-}
-
-func TestParseSubscriptionStatus_Empty(t *testing.T) {
-	s, err := parseSubscriptionStatus(fixture(t, "empty.txt"))
-	require.NoError(t, err)
-	assert.Equal(t, 0, s.CurrentConnections)
-}
-
-func TestParseSubscriptionStatus_InvalidJSON(t *testing.T) {
-	_, err := parseSubscriptionStatus("not json")
-	assert.Error(t, err)
-}
-
-func TestParseSubscriptionStatus_NotConfigured(t *testing.T) {
-	s, err := parseSubscriptionStatus(fixture(t, "subscription_status_not_configured.txt"))
-	require.NoError(t, err)
-	assert.Equal(t, "NOT_CONFIGURED", s.State)
-	assert.Equal(t, 0, s.CurrentConnections)
-}
-
 func TestToJSON_PythonDict(t *testing.T) {
 	input := "{'key': 'value', 'flag': True, 'none': None}"
 	result := toJSON(input)
@@ -219,15 +176,6 @@ func TestCollectVPNSummary_Integration(t *testing.T) {
 	assert.True(t, s.OvpnDcoAvailable)
 }
 
-func TestCollectSubscriptionStatus_Integration(t *testing.T) {
-	b := NewWithRunner(Config{}, fixtureRunner(t, "subscription_status.txt"))
-	s, err := b.CollectSubscriptionStatus(context.Background())
-	require.NoError(t, err)
-	assert.Equal(t, 10, s.CurrentConnections)
-	assert.Equal(t, 50, s.MaxConnections)
-	assert.Equal(t, "ACTIVE", s.State)
-}
-
 func TestCollectServiceStatus_Integration(t *testing.T) {
 	b := NewWithRunner(Config{}, fixtureRunner(t, "service_status.txt"))
 	s, err := b.CollectServiceStatus(context.Background())
@@ -253,14 +201,6 @@ func TestCollectVPNSummary_Error(t *testing.T) {
 	})
 	_, err := b.CollectVPNSummary(context.Background())
 	assert.Contains(t, err.Error(), "sacli VPNSummary")
-}
-
-func TestCollectSubscriptionStatus_Error(t *testing.T) {
-	b := NewWithRunner(Config{}, func(_ context.Context, _ string, _ ...string) (string, error) {
-		return "", errors.New("fail")
-	})
-	_, err := b.CollectSubscriptionStatus(context.Background())
-	assert.Contains(t, err.Error(), "sacli SubscriptionStatus")
 }
 
 func TestCollectServiceStatus_Error(t *testing.T) {

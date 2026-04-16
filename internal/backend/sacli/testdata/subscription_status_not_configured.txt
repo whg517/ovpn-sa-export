@@ -1,1 +1,0 @@
-{'error': 'Subscription server is not configured', 'state': 'NOT_CONFIGURED'}

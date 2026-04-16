@@ -57,7 +57,7 @@ func Load(configFile string) (*Config, error) {
 	v.SetDefault("collector.timeout", "30s")
 	v.SetDefault("collector.cache_ttl", "60s")
 	v.SetDefault("collector.enabled_collectors", []string{
-		"vpn_status", "vpn_summary", "subscription", "service",
+		"vpn_status", "vpn_summary", "service",
 	})
 	v.SetDefault("log.level", "info")
 	v.SetDefault("log.format", "json")

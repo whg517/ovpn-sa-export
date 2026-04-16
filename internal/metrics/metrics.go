@@ -17,10 +17,6 @@ type Registry struct {
 	clientBytesRecv   *prometheus.GaugeVec
 	clientBytesSent   *prometheus.GaugeVec
 	clientConnected   *prometheus.GaugeVec
-	subCurrent        prometheus.Gauge
-	subMax            prometheus.Gauge
-	subFallback       prometheus.Gauge
-	subLastUpdate     prometheus.Gauge
 	serviceUp         *prometheus.GaugeVec
 	scrapeDuration    *prometheus.HistogramVec
 	scrapeTotal       *prometheus.CounterVec
@@ -63,23 +59,6 @@ func NewRegistry() *Registry {
 		Help: "UNIX timestamp when the VPN client connected.",
 	}, []string{"username", "common_name"})
 
-	r.subCurrent = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "ovpn_sa_export_subscription_current_connections",
-		Help: "Current number of client connections in use.",
-	})
-	r.subMax = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "ovpn_sa_export_subscription_max_connections",
-		Help: "Maximum number of client connections allowed by subscription.",
-	})
-	r.subFallback = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "ovpn_sa_export_subscription_fallback_connections",
-		Help: "Number of fallback connections in use.",
-	})
-	r.subLastUpdate = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "ovpn_sa_export_subscription_last_update_timestamp",
-		Help: "UNIX timestamp of the last successful subscription update.",
-	})
-
 	r.serviceUp = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "ovpn_sa_export_service_up",
 		Help: "Whether an internal AS service is running.",
@@ -107,10 +86,6 @@ func NewRegistry() *Registry {
 		r.clientBytesRecv,
 		r.clientBytesSent,
 		r.clientConnected,
-		r.subCurrent,
-		r.subMax,
-		r.subFallback,
-		r.subLastUpdate,
 		r.serviceUp,
 		r.scrapeDuration,
 		r.scrapeTotal,
@@ -166,17 +141,6 @@ func (r *Registry) UpdateVPNSummary(s *types.VPNSummary) {
 	} else {
 		r.dcoAvailable.Set(0)
 	}
-}
-
-// UpdateSubscription updates subscription/license metrics.
-func (r *Registry) UpdateSubscription(s *types.SubscriptionStatus) {
-	if s == nil {
-		return
-	}
-	r.subCurrent.Set(float64(s.CurrentConnections))
-	r.subMax.Set(float64(s.MaxConnections))
-	r.subFallback.Set(float64(s.FallbackConnections))
-	r.subLastUpdate.Set(float64(s.LastSuccessfulUpdate.Unix()))
 }
 
 // UpdateServiceStatus updates service health metrics.

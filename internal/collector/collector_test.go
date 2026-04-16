@@ -15,23 +15,22 @@ import (
 
 // mockBackend implements Backend for testing.
 type mockBackend struct {
-	name                  string
-	vpnStatusFn           func(ctx context.Context) ([]types.VPNClientStatus, error)
-	vpnSummaryFn          func(ctx context.Context) (*types.VPNSummary, error)
-	subscriptionStatusFn  func(ctx context.Context) (*types.SubscriptionStatus, error)
-	serviceStatusFn       func(ctx context.Context) (*types.ServiceStatus, error)
+	name            string
+	vpnStatusFn     func(ctx context.Context) ([]types.VPNClientStatus, error)
+	vpnSummaryFn    func(ctx context.Context) (*types.VPNSummary, error)
+	serviceStatusFn func(ctx context.Context) (*types.ServiceStatus, error)
 }
 
-func (m *mockBackend) Name() string                           { return m.name }
+func (m *mockBackend) Name() string { return m.name }
+
 func (m *mockBackend) CollectVPNStatus(ctx context.Context) ([]types.VPNClientStatus, error) {
 	return m.vpnStatusFn(ctx)
 }
+
 func (m *mockBackend) CollectVPNSummary(ctx context.Context) (*types.VPNSummary, error) {
 	return m.vpnSummaryFn(ctx)
 }
-func (m *mockBackend) CollectSubscriptionStatus(ctx context.Context) (*types.SubscriptionStatus, error) {
-	return m.subscriptionStatusFn(ctx)
-}
+
 func (m *mockBackend) CollectServiceStatus(ctx context.Context) (*types.ServiceStatus, error) {
 	return m.serviceStatusFn(ctx)
 }
@@ -69,9 +68,6 @@ func TestCollectorStartAndStop(t *testing.T) {
 		vpnSummaryFn: func(ctx context.Context) (*types.VPNSummary, error) {
 			return &types.VPNSummary{NClients: 1}, nil
 		},
-		subscriptionStatusFn: func(ctx context.Context) (*types.SubscriptionStatus, error) {
-			return &types.SubscriptionStatus{CurrentConnections: 1}, nil
-		},
 		serviceStatusFn: func(ctx context.Context) (*types.ServiceStatus, error) {
 			return &types.ServiceStatus{Services: map[string]bool{"OPENVPN": true}}, nil
 		},
@@ -99,9 +95,6 @@ func TestCollectorCollectAllSuccess(t *testing.T) {
 		vpnSummaryFn: func(ctx context.Context) (*types.VPNSummary, error) {
 			return &types.VPNSummary{NClients: 1, OvpnDcoAvailable: true, OvpnDcoVersion: "v2"}, nil
 		},
-		subscriptionStatusFn: func(ctx context.Context) (*types.SubscriptionStatus, error) {
-			return &types.SubscriptionStatus{CurrentConnections: 1, MaxConnections: 10, State: "ACTIVE"}, nil
-		},
 		serviceStatusFn: func(ctx context.Context) (*types.ServiceStatus, error) {
 			return &types.ServiceStatus{Services: map[string]bool{"OPENVPN": true, "WEB": false}}, nil
 		},
@@ -120,9 +113,6 @@ func TestCollectorCollectVPNSummaryError(t *testing.T) {
 		vpnSummaryFn: func(ctx context.Context) (*types.VPNSummary, error) {
 			return nil, errors.New("sacli failed")
 		},
-		subscriptionStatusFn: func(ctx context.Context) (*types.SubscriptionStatus, error) {
-			return nil, nil
-		},
 		serviceStatusFn: func(ctx context.Context) (*types.ServiceStatus, error) {
 			return nil, nil
 		},
@@ -136,11 +126,10 @@ func TestCollectorCollectVPNSummaryError(t *testing.T) {
 func TestCollectorCollectAllErrors(t *testing.T) {
 	mockErr := errors.New("backend error")
 	mock := &mockBackend{
-		name:                 "mock",
-		vpnStatusFn:          func(ctx context.Context) ([]types.VPNClientStatus, error) { return nil, mockErr },
-		vpnSummaryFn:         func(ctx context.Context) (*types.VPNSummary, error) { return nil, mockErr },
-		subscriptionStatusFn: func(ctx context.Context) (*types.SubscriptionStatus, error) { return nil, mockErr },
-		serviceStatusFn:      func(ctx context.Context) (*types.ServiceStatus, error) { return nil, mockErr },
+		name:            "mock",
+		vpnStatusFn:     func(ctx context.Context) ([]types.VPNClientStatus, error) { return nil, mockErr },
+		vpnSummaryFn:    func(ctx context.Context) (*types.VPNSummary, error) { return nil, mockErr },
+		serviceStatusFn: func(ctx context.Context) (*types.ServiceStatus, error) { return nil, mockErr },
 	}
 
 	c := newCollectorWithMock(mock)
@@ -161,9 +150,6 @@ func TestCollectorContextCancellation(t *testing.T) {
 			return nil, nil
 		},
 		vpnSummaryFn: func(ctx context.Context) (*types.VPNSummary, error) {
-			return nil, nil
-		},
-		subscriptionStatusFn: func(ctx context.Context) (*types.SubscriptionStatus, error) {
 			return nil, nil
 		},
 		serviceStatusFn: func(ctx context.Context) (*types.ServiceStatus, error) {
@@ -188,9 +174,6 @@ func TestCollectorEmptyClients(t *testing.T) {
 		vpnSummaryFn: func(ctx context.Context) (*types.VPNSummary, error) {
 			return &types.VPNSummary{NClients: 0}, nil
 		},
-		subscriptionStatusFn: func(ctx context.Context) (*types.SubscriptionStatus, error) {
-			return &types.SubscriptionStatus{}, nil
-		},
 		serviceStatusFn: func(ctx context.Context) (*types.ServiceStatus, error) {
 			return &types.ServiceStatus{Services: map[string]bool{}}, nil
 		},
@@ -207,9 +190,6 @@ func TestCollectorDefaultInterval(t *testing.T) {
 			return nil, nil
 		},
 		vpnSummaryFn: func(ctx context.Context) (*types.VPNSummary, error) {
-			return nil, nil
-		},
-		subscriptionStatusFn: func(ctx context.Context) (*types.SubscriptionStatus, error) {
 			return nil, nil
 		},
 		serviceStatusFn: func(ctx context.Context) (*types.ServiceStatus, error) {
@@ -245,9 +225,6 @@ func TestCollectorRecordScrapeMetrics(t *testing.T) {
 		},
 		vpnSummaryFn: func(ctx context.Context) (*types.VPNSummary, error) {
 			return &types.VPNSummary{NClients: 1}, nil
-		},
-		subscriptionStatusFn: func(ctx context.Context) (*types.SubscriptionStatus, error) {
-			return &types.SubscriptionStatus{CurrentConnections: 1}, nil
 		},
 		serviceStatusFn: func(ctx context.Context) (*types.ServiceStatus, error) {
 			return &types.ServiceStatus{Services: map[string]bool{"X": true}}, nil

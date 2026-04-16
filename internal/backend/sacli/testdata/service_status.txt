@@ -1,0 +1,4 @@
+OPENVPN: running
+AUTH: running
+WEB: stopped
+AGENT: running

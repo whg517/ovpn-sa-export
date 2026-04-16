@@ -1,0 +1,5 @@
+CurrentCc=5
+MaxCc=25
+FallbackCc=1
+LastSuccessfulUpdate=1712000000
+State=ACTIVE

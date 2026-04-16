@@ -1,0 +1,2 @@
+OpenVPN daemon: openvpn0 (TCP)
+CLIENT_LIST	Common Name	Real Address	Virtual Address	Virtual IPv6 Address	Bytes Received	Bytes Sent	Connected Since (time_t)	Username	Client ID	Peer ID

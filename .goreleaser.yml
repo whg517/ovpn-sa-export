@@ -70,8 +70,8 @@ changelog:
 
 dockers:
   - image_templates:
-      - "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:{{ .Version }}"
-      - "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:latest"
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:{{ .Version }}"
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:latest"
     dockerfile: deployments/Dockerfile
     build_flag_templates:
       - "--label=org.opencontainers.image.version={{.Version}}"
@@ -79,8 +79,8 @@ dockers:
       - "--label=org.opencontainers.image.created={{.Date}}"
       - "--platform=linux/amd64"
   - image_templates:
-      - "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:{{ .Version }}-arm64"
-      - "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:latest-arm64"
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:{{ .Version }}-arm64"
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:latest-arm64"
     dockerfile: deployments/Dockerfile
     goarch: arm64
     build_flag_templates:
@@ -90,12 +90,12 @@ dockers:
       - "--platform=linux/arm64"
 
 docker_manifests:
-  - name_template: "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:{{ .Version }}"
+  - name_template: "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:{{ .Version }}"
     image_templates:
-      - "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:{{ .Version }}-amd64"
-      - "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:{{ .Version }}-arm64"
-  - name_template: "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:latest"
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:{{ .Version }}-amd64"
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:{{ .Version }}-arm64"
+  - name_template: "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:latest"
     image_templates:
-      - "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:latest-amd64"
-      - "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:latest-arm64"
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:latest-amd64"
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/ovpn-sa-export:latest-arm64"
 

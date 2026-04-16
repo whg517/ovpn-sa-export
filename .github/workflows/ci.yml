@@ -49,8 +49,13 @@ jobs:
         with:
           go-version: "1.24"
 
+      - name: Capture Go version
+        run: echo "GOVERSION=$(go version | awk '{print $3}')" >> "$GITHUB_ENV"
+
       - name: Build binary
-        run: go build -o ovpn-sa-export ./cmd/ovpn-sa-export
+        run: |
+          go build -ldflags="-s -w -X main.version=$(git describe --tags --always --dirty) -X main.commit=$(git rev-parse --short HEAD) -X main.buildTime=$(date -u '+%Y-%m-%dT%H:%M:%SZ') -X main.goVersion=$GOVERSION" \
+            -o ovpn-sa-export ./cmd/ovpn-sa-export
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

@@ -1,0 +1,119 @@
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - main: ./cmd/ovpn-sa-export
+    binary: ovpn-sa-export
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.buildTime={{.Date}}
+      - -X main.goVersion={{.Env.GOVERSION}}
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+      - arm
+    goarm:
+      - 6
+      - 7
+
+archives:
+  - format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "arm64" }}aarch64
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - LICENSE*
+      - README*
+      - CHANGELOG*
+
+checksum:
+  name_template: "checksums.txt"
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next.{{ .Commit }}"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^ci:"
+      - "^chore:"
+      - "^style:"
+  groups:
+    - title: Features
+      regexp: "^.*?feat(\\([^)]*\\))?:"
+      order: 0
+    - title: Bug Fixes
+      regexp: "^.*?fix(\\([^)]*\\))?:"
+      order: 1
+    - title: Other Changes
+      order: 999
+
+dockers:
+  - image_templates:
+      - "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:{{ .Version }}"
+      - "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:latest"
+    dockerfile: deployments/Dockerfile
+    build_flag_templates:
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.revision={{.Commit}}"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--platform=linux/amd64"
+  - image_templates:
+      - "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:{{ .Version }}-arm64"
+      - "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:latest-arm64"
+    dockerfile: deployments/Dockerfile
+    goarch: arm64
+    build_flag_templates:
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.revision={{.Commit}}"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--platform=linux/arm64"
+
+docker_manifests:
+  - image_template: "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:{{ .Version }}"
+    image_templates:
+      - "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:{{ .Version }}-amd64"
+      - "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:{{ .Version }}-arm64"
+  - image_template: "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:latest"
+    image_templates:
+      - "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:latest-amd64"
+      - "ghcr.io/{{ .RepoOwner }}/ovpn-sa-export:latest-arm64"
+
+brews:
+  - repository:
+      owner: "{{ .RepoOwner }}"
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    homepage: https://github.com/whg517/ovpn-sa-export
+    description: OpenVPN Access Server Prometheus exporter
+    install: |
+      bin.install "ovpn-sa-export"
+
+scoops:
+  - repository:
+      owner: "{{ .RepoOwner }}"
+      name: scoop-bucket
+      token: "{{ .Env.SCOOP_BUCKET_GITHUB_TOKEN }}"
+    homepage: https://github.com/whg517/ovpn-sa-export
+    description: OpenVPN Access Server Prometheus exporter
+    license: MIT

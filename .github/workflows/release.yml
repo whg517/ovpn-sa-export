@@ -1,0 +1,66 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      - name: Capture Go version
+        run: echo "GOVERSION=$(go version | awk '{print $3}')" >> "$GITHUB_ENV"
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GOVERSION: ${{ env.GOVERSION }}
+          # Uncomment below when homebrew/scoop tap repos are created:
+          # HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
+          # SCOOP_BUCKET_GITHUB_TOKEN: ${{ secrets.SCOOP_BUCKET_GITHUB_TOKEN }}
+
+  # Quick validation: push a test snapshot build without creating a release
+  # Trigger manually or on main push (commented out by default)
+  # Uncomment the snapshot job below to enable snapshot builds on main pushes.
+  #
+  # snapshot:
+  #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  #   name: Snapshot
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
+  #     - uses: actions/setup-go@v5
+  #       with:
+  #         go-version: "1.24"
+  #     - run: echo "GOVERSION=$(go version | awk '{print $3}')" >> "$GITHUB_ENV"
+  #     - uses: goreleaser/goreleaser-action@v6
+  #       with:
+  #         distribution: goreleaser
+  #         version: "~> v2"
+  #         args: release --clean --snapshot
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #         GOVERSION: ${{ env.GOVERSION }}

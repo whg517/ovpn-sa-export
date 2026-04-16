@@ -57,6 +57,9 @@ jobs:
           go build -ldflags="-s -w -X main.version=$(git describe --tags --always --dirty) -X main.commit=$(git rev-parse --short HEAD) -X main.buildTime=$(date -u '+%Y-%m-%dT%H:%M:%SZ') -X main.goVersion=$GOVERSION" \
             -o ovpn-sa-export ./cmd/ovpn-sa-export
 
+      - name: Build Docker image (multi-stage)
+        run: docker build -f deployments/Dockerfile.legacy -t ovpn-sa-export .
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
